@@ -167,6 +167,9 @@
                 <version>3.3.0</version>
                 <configuration>
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                    <systemPropertyVariables>
+                        <java.util.logging.config.file>${basedir}/src/test/resources/logging.properties</java.util.logging.config.file>
+                    </systemPropertyVariables>
                 </configuration>
                 <dependencies>
                     <dependency>

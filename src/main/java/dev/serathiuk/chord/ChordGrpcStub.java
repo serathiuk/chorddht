@@ -1,7 +1,9 @@
 package dev.serathiuk.chord;
 
 import dev.serathiuk.chord.grpc.ChordGrpc;
+import dev.serathiuk.chord.grpc.Empty;
 import dev.serathiuk.chord.grpc.Node;
+import dev.serathiuk.chord.grpc.NodeData;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
@@ -33,6 +35,10 @@ public class ChordGrpcStub implements AutoCloseable {
     public ChordGrpc.ChordBlockingStub getStub() {
         init();
         return stub;
+    }
+
+    public NodeData getNodeData() {
+        return stub.getNodeData(Empty.getDefaultInstance());
     }
 
     @Override
