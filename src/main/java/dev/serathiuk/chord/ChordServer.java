@@ -13,12 +13,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
 
 public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
-
-    private static final Logger logger = Logger.getLogger(ChordServer.class.getName());
 
     private Server server;
     private ExecutorService executorService;
@@ -30,6 +27,7 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
     private boolean started = false;
     private Map<String, String> mapInformation = new HashMap<>();
     private KeyService keyService;
+    private Object lock = new Object();
 
     public ChordServer(ChordServerConfig config) {
         this.config = config;
@@ -52,10 +50,10 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
                     .setPort(config.remotePort())
                     .build();
 
-            logger.info("Node "+node.getId()+" | Configure successor: "+ this.successor);
+            System.out.println("Node "+node.getId()+" | Configure successor: "+ this.successor);
         }
 
-        logger.info("Node "+node.getId()+" | Configure node: "+ this.node);
+        System.out.println("Node "+node.getId()+" | Configure node: "+ this.node);
     }
 
     @Override
@@ -63,10 +61,12 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
         try {
             server = Grpc.newServerBuilderForPort(node.getPort(), InsecureServerCredentials.create())
                     .addService(this)
+                    .keepAliveTime(5, TimeUnit.SECONDS)  // Tempo entre verificações de keepalive
+                    .keepAliveTimeout(10, TimeUnit.SECONDS)
                     .build()
                     .start();
 
-            logger.info("Server started, listening on " + node.getHost()+":"+node.getPort());
+            System.out.println("Server started, listening on " + node.getHost()+":"+node.getPort());
 
             join();
 
@@ -75,10 +75,11 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
                 while(true) {
                     try {
                         Thread.sleep(500);
-                        stabilize();
                         fixFingers();
+                        stabilize();
                     } catch (InterruptedException e) {
-                        logger.log(Level.SEVERE, "Node "+node.getId()+" | Error", e);
+                        System.err.println( "Node "+node.getId());
+                        e.printStackTrace();
                     }
                 }
             });
@@ -93,14 +94,17 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
             server.awaitTermination();
         } catch (InterruptedException | IOException e) {
-            logger.log(Level.SEVERE, "Node "+node.getId()+" | Error", e);
+            System.err.println( "Node "+node.getId());
+            e.printStackTrace();
         }
     }
 
     @Override
     public void findSuccessor(NodeId request, StreamObserver<Node> responseObserver) {
-        responseObserver.onNext(findSuccessor(request));
-        responseObserver.onCompleted();
+        synchronized (lock) {
+            responseObserver.onNext(findSuccessor(request));
+            responseObserver.onCompleted();
+        }
     }
 
     private Node findSuccessor(NodeId request) {
@@ -114,7 +118,8 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
         try(var chordStub = new ChordGrpcStub(pred)) {
             return chordStub.getNodeData().getNodeSuccessor();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Node "+node.getId()+" | Error", e);
+            System.err.println( "Node "+node.getId());
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -145,41 +150,57 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
     }
 
     private void join() {
-        if(successor == null || StringUtils.isEmpty(successor.getId())) {
-            successor = node;
-            predecessor = node;
-            return;
-        }
+        synchronized (lock) {
+            if(successor == null || StringUtils.isEmpty(successor.getId()) || successor.getId().equals(node.getId())) {
+                successor = node;
+                predecessor = node;
+                fingerTable[0] = node;
+                return;
+            }
 
-        try(var chordStub = new ChordGrpcStub(successor)) {
-            successor = chordStub.getStub().findSuccessor(NodeId.newBuilder()
-                    .setId(node.getId())
-                    .build());
-            predecessor = null;
+            try(var chordStub = new ChordGrpcStub(successor)) {
+                successor = chordStub.getStub().findSuccessor(NodeId.newBuilder()
+                        .setId(node.getId())
+                        .build());
+                predecessor = null;
+            } catch (Exception e) {
+                System.err.println( "Node "+node.getId());
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
 
-            chordStub.getStub().notify(node);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Node "+node.getId()+" | Error", e);
-            throw new RuntimeException(e);
+            if(!successor.getId().equals(node.getId())) {
+                try(var chordStub = new ChordGrpcStub(successor)) {
+                    chordStub.getStub().notify(node);
+                } catch (Exception e) {
+                    System.err.println( "Node "+node.getId());
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
     @Override
     public void getNodeData(Empty request, StreamObserver<NodeData> responseObserver) {
-        responseObserver.onNext(getNodeData());
-        responseObserver.onCompleted();
+        synchronized (lock) {
+            responseObserver.onNext(getNodeData());
+            responseObserver.onCompleted();
+        }
     }
 
     @Override
     public void notify(Node request, StreamObserver<Empty> responseObserver) {
-        if(predecessor == null || StringUtils.isEmpty(predecessor.getId()) ||
-                keyService.isBetween(request.getId(), predecessor.getId(), node.getId(), false)) {
-            predecessor = request;
-            logger.info("Node "+node.getId()+" | Atualizado predecessor de "+node.getId()+" para: "+predecessor);
-        }
+        synchronized (lock) {
+            if(predecessor == null || StringUtils.isEmpty(predecessor.getId()) ||
+                    keyService.isBetween(request.getId(), predecessor.getId(), node.getId(), false)) {
+                predecessor = request;
+                System.out.println("Node "+node.getId()+" | Atualizado predecessor de "+node.getId()+" para: "+predecessor);
+            }
 
-        responseObserver.onNext(Empty.getDefaultInstance());
-        responseObserver.onCompleted();
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        }
     }
 
     @Override
@@ -193,40 +214,57 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
     }
 
     public void stabilize() {
-        if(successor == null || successor.getPort() <= 0)
-            return;
+        synchronized (lock) {
+            if(successor == null || successor.getPort() <= 0 || successor.getId().equals(node.getId()))
+                return;
 
-        logger.info("Node "+node.getId()+" | Stabilizing node: " + node.toString());
-        try(var chordStub = new ChordGrpcStub(successor)) {
-            var x = chordStub.getNodeData().getNodePredecessor();
-
-            if(x != null && keyService.isBetween(x.getId(), node.getId(), successor.getId(), false)) {
-                successor = x;
-                logger.info("Node "+node.getId()+" | New successor: " + successor);
+            System.out.println("Node "+node.getId()+" | Stabilizing node: " + node.toString());
+            try(var chordStub = new ChordGrpcStub(successor)) {
+                var x = chordStub.getNodeData().getNodePredecessor();
+                if(x != null && keyService.isBetween(x.getId(), node.getId(), successor.getId(), false)) {
+                    successor = x;
+                    fingerTable[0] = successor;
+                    System.out.println("Node "+node.getId()+" | New successor: " + successor);
+                }
+            } catch (Exception e) {
+                System.err.println( "Node "+node.getId());
+                e.printStackTrace();
+                throw new RuntimeException(e);
             }
 
-            chordStub.getStub().notify(node);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Node "+node.getId()+" | Error", e);
-            throw new RuntimeException(e);
+            if(!successor.getId().equals(node.getId())) {
+                try(var chordStub = new ChordGrpcStub(successor)) {
+                    chordStub.getStub().notify(node);
+                } catch (Exception e) {
+                    System.err.println( "Node "+node.getId());
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
     public void fixFingers() {
-        if(successor == null || successor.getPort() <= 0)
-            return;
+        synchronized (lock) {
+            if(successor == null || successor.getPort() <= 0 || successor.getId().equals(node.getId()))
+                return;
 
-        var random = new Random();
-        var indice = random.nextInt(fingerTable.length);
-        var identificador = ChordUtil.calculateFTNode(node.getId(), indice+1, fingerTable.length);
+            var random = new Random();
+            var indice = random.nextInt(fingerTable.length);
+            var identificador = ChordUtil.calculateFTNode(node.getId(), indice+1, fingerTable.length);
 
-        logger.info("Node "+node.getId()+" | Fixing finger: " + identificador);
+            System.out.println("Node "+node.getId()+" | Fixing finger: " + identificador);
 
-        fingerTable[indice] = findSuccessor(NodeId.newBuilder()
-                .setId(identificador)
-                .build());
+            fingerTable[indice] = findSuccessor(NodeId.newBuilder()
+                    .setId(identificador)
+                    .build());
 
-        logger.info("Node "+node.getId()+" | Fixed finger: " + identificador+ " Node: "+ fingerTable[indice].getId());
+            if(indice == 0) {
+                successor = fingerTable[0];
+            }
+
+            System.out.println("Node "+node.getId()+" | Fixed finger: " + identificador+ " Node: "+ fingerTable[indice].getId());
+        }
     }
 
     public NodeData getNodeData() {

@@ -29,7 +29,7 @@ public class ChordGrpcStub implements AutoCloseable {
     private void init() {
         if(stub != null) return;
         channel = Grpc.newChannelBuilder(address, InsecureChannelCredentials.create()).build();
-        stub = ChordGrpc.newBlockingStub(channel);
+        stub = ChordGrpc.newBlockingStub(channel).withDeadlineAfter(5, TimeUnit.SECONDS);
     }
 
     public ChordGrpc.ChordBlockingStub getStub() {
