@@ -48,6 +48,19 @@ class LocalChordNodeTest {
             node4.fixFingers();
         }
 
+
+        LocalChordNode node5 = new LocalChordNode("localhost", 8084);
+        node5.join(node1);
+
+        for(var i = 0; i < 10; i++) {
+            node1.fixFingers();
+            node2.fixFingers();
+            node3.fixFingers();
+            node4.fixFingers();
+            node5.fixFingers();
+        }
+
+
 //        8080 => 169 -> node1
 //        8081 => 43 -> node2
 //        8082 => 232 -> node3
@@ -59,12 +72,13 @@ class LocalChordNodeTest {
         System.out.println(" node2: "+node2.getPredecessor().getId()+" -> "+node2.getId()+" -> "+node2.getSuccessor().getId());
         System.out.println(" node3: "+(node3.getPredecessor() != null ? node3.getPredecessor().getId() : null)+" -> "+node3.getId()+" -> "+node3.getSuccessor().getId());
         System.out.println(" node4: "+node4.getPredecessor().getId()+" -> "+node4.getId()+" -> "+node4.getSuccessor().getId());
+        System.out.println(" node5: "+node5.getPredecessor().getId()+" -> "+node5.getId()+" -> "+node5.getSuccessor().getId());
 
         assertEquals(node3.getId(), node1.getSuccessor().getId());
         assertEquals(node4.getId(), node2.getSuccessor().getId());
-        assertEquals(node2.getId(), node3.getSuccessor().getId());
+        assertEquals(node5.getId(), node3.getSuccessor().getId());
         assertEquals(node1.getId(), node4.getSuccessor().getId());
-
+        assertEquals(node2.getId(), node5.getSuccessor().getId());
 
 //        LocalChordNode node3 = new LocalChordNode("localhost", 8082);
 ////        LocalChordNode node4 = new LocalChordNode("localhost", 8083);

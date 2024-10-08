@@ -76,10 +76,14 @@ public class LocalChordNode implements ChordNode {
         }
 
         while(!Key.isBetween(id, n.getId(), n.getSuccessor().getId(), true)) {
-            n = n.closestPrecedingNode(id);
-            if(n.getId().equals(this.id)) {
+            var x = n.closestPrecedingNode(id);
+            if(x.getId().equals(this.id)) {
+                break;
+            } else if(x.getId().equals(n.getId())) {
                 break;
             }
+
+            n = x;
         }
 
         return n;
