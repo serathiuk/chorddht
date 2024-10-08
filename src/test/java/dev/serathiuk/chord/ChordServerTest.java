@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ChordServerTest {
 
@@ -18,13 +19,11 @@ class ChordServerTest {
     private static final int NUMBER_OF_BITS_KEY = 5;
 
     private ExecutorService executor;
-    private KeyService keyService;
     private List<ChordServer> chordServers;
 
     @BeforeEach
     public void setUp() {
         executor = Executors.newFixedThreadPool(10);
-        keyService = new KeyService(NUMBER_OF_BITS_KEY);
         chordServers = new ArrayList<>();
     }
 
@@ -42,19 +41,17 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            var id = keyService.hash(LOCALHOST, port);
-
-            assertEquals(keyService.hash(LOCALHOST, port), nodeData.getNode().getId());
+            assertEquals(Key.hash(LOCALHOST, port), nodeData.getNode().getId());
             assertEquals(LOCALHOST, nodeData.getNode().getHost());
             assertEquals(port, nodeData.getNode().getPort());
 
-            assertEquals(id, nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port, nodeData.getNodeSuccessor().getPort());
+            assertEquals("", nodeData.getNodeSuccessor().getId());
+            assertEquals("", nodeData.getNodeSuccessor().getHost());
+            assertEquals(0, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(id, nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port, nodeData.getNodePredecessor().getPort());
+            assertEquals("", nodeData.getNodePredecessor().getId());
+            assertEquals("", nodeData.getNodePredecessor().getHost());
+            assertEquals(0, nodeData.getNodePredecessor().getPort());
         }
     }
 
@@ -77,21 +74,21 @@ class ChordServerTest {
                     .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
                     .build());
 
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         // Check node 2
         try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNode().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNode().getId());
             assertEquals(LOCALHOST, nodeData.getNode().getHost());
             assertEquals(port2, nodeData.getNode().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port1, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port1, nodeData.getNodePredecessor().getPort());
         }
@@ -100,15 +97,15 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNode().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNode().getId());
             assertEquals(LOCALHOST, nodeData.getNode().getHost());
             assertEquals(port1, nodeData.getNode().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port2, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port2, nodeData.getNodePredecessor().getPort());
         }
@@ -151,15 +148,15 @@ class ChordServerTest {
 //        try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
 //            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNode().getId());
+//            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNode().getId());
 //            assertEquals(LOCALHOST, nodeData.getNode().getHost());
 //            assertEquals(port1, nodeData.getNode().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port4), nodeData.getNodeSuccessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNodeSuccessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
 //            assertEquals(port4, nodeData.getNodeSuccessor().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port5), nodeData.getNodePredecessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port5), nodeData.getNodePredecessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
 //            assertEquals(port5, nodeData.getNodePredecessor().getPort());
 //        }
@@ -168,15 +165,15 @@ class ChordServerTest {
 //        try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
 //            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNode().getId());
+//            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNode().getId());
 //            assertEquals(LOCALHOST, nodeData.getNode().getHost());
 //            assertEquals(port2, nodeData.getNode().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port5), nodeData.getNodeSuccessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port5), nodeData.getNodeSuccessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
 //            assertEquals(port5, nodeData.getNodeSuccessor().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
 //            assertEquals(port3, nodeData.getNodePredecessor().getPort());
 //        }
@@ -185,15 +182,15 @@ class ChordServerTest {
 //        try(var stub = new ChordGrpcStub(LOCALHOST, port3)) {
 //            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port3), nodeData.getNode().getId());
+//            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNode().getId());
 //            assertEquals(LOCALHOST, nodeData.getNode().getHost());
 //            assertEquals(port3, nodeData.getNode().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
 //            assertEquals(port2, nodeData.getNodeSuccessor().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port4), nodeData.getNodePredecessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNodePredecessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
 //            assertEquals(port4, nodeData.getNodePredecessor().getPort());
 //        }
@@ -202,15 +199,15 @@ class ChordServerTest {
 //        try(var stub = new ChordGrpcStub(LOCALHOST, port4)) {
 //            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port4), nodeData.getNode().getId());
+//            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNode().getId());
 //            assertEquals(LOCALHOST, nodeData.getNode().getHost());
 //            assertEquals(port4, nodeData.getNode().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
 //            assertEquals(port3, nodeData.getNodeSuccessor().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
 //            assertEquals(port1, nodeData.getNodePredecessor().getPort());
 //        }
@@ -219,15 +216,15 @@ class ChordServerTest {
 //        try(var stub = new ChordGrpcStub(LOCALHOST, port5)) {
 //            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port5), nodeData.getNode().getId());
+//            assertEquals(Key.hash(LOCALHOST, port5), nodeData.getNode().getId());
 //            assertEquals(LOCALHOST, nodeData.getNode().getHost());
 //            assertEquals(port5, nodeData.getNode().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
 //            assertEquals(port1, nodeData.getNodeSuccessor().getPort());
 //
-//            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
+//            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
 //            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
 //            assertEquals(port2, nodeData.getNodePredecessor().getPort());
 //        }
@@ -247,11 +244,11 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port4), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port4, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port2, nodeData.getNodePredecessor().getPort());
         }
@@ -260,11 +257,11 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port1, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port3, nodeData.getNodePredecessor().getPort());
         }
@@ -273,11 +270,11 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port3)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port2, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port4), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port4, nodeData.getNodePredecessor().getPort());
         }
@@ -286,15 +283,15 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port4)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port4), nodeData.getNode().getId());
+            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNode().getId());
             assertEquals(LOCALHOST, nodeData.getNode().getHost());
             assertEquals(port4, nodeData.getNode().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port3, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port1, nodeData.getNodePredecessor().getPort());
         }
@@ -315,11 +312,11 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port3, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port2, nodeData.getNodePredecessor().getPort());
         }
@@ -328,11 +325,11 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port1, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port3, nodeData.getNodePredecessor().getPort());
         }
@@ -341,15 +338,15 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port3)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port3), nodeData.getNode().getId());
+            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNode().getId());
             assertEquals(LOCALHOST, nodeData.getNode().getHost());
             assertEquals(port3, nodeData.getNode().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port2, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port1, nodeData.getNodePredecessor().getPort());
         }
@@ -368,11 +365,11 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port2, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port2, nodeData.getNodePredecessor().getPort());
         }
@@ -381,15 +378,15 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port2), nodeData.getNode().getId());
+            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNode().getId());
             assertEquals(LOCALHOST, nodeData.getNode().getHost());
             assertEquals(port2, nodeData.getNode().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port1, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port1, nodeData.getNodePredecessor().getPort());
         }
@@ -406,15 +403,15 @@ class ChordServerTest {
         try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
             var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNode().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNode().getId());
             assertEquals(LOCALHOST, nodeData.getNode().getHost());
             assertEquals(port1, nodeData.getNode().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
             assertEquals(port1, nodeData.getNodeSuccessor().getPort());
 
-            assertEquals(keyService.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
+            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
             assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
             assertEquals(port1, nodeData.getNodePredecessor().getPort());
         }
