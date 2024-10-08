@@ -12,9 +12,7 @@ public interface ChordNode {
     public int getPort();
     public ChordNode getSuccessor();
     public ChordNode getPredecessor();
-    public void join(ChordNode node);
     public void notify(ChordNode node);
     public ChordNode findSuccessor(String id);
-    public ChordNode findPredecessor(String id);
     public ChordNode closestPrecedingNode(String id);
 }

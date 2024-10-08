@@ -72,12 +72,14 @@ public final class ChordOuterClass {
       "\022\r\n\005value\030\002 \001(\t\"\035\n\013PutResponse\022\016\n\006nodeId" +
       "\030\001 \001(\t\"\031\n\nGetRequest\022\013\n\003key\030\001 \001(\t\"9\n\013Get" +
       "Response\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\022\016\n\006" +
-      "nodeId\030\003 \001(\t\"\007\n\005Empty2\242\001\n\005Chord\022\037\n\rfindS" +
-      "uccessor\022\007.NodeId\032\005.Node\022\027\n\006notify\022\005.Nod" +
-      "e\032\006.Empty\022 \n\013getNodeData\022\006.Empty\032\t.NodeD" +
-      "ata\022\033\n\003put\022\006.Entry\032\014.PutResponse\022 \n\003get\022" +
-      "\013.GetRequest\032\014.GetResponseB\034\n\030dev.serath" +
-      "iuk.chord.grpcP\001b\006proto3"
+      "nodeId\030\003 \001(\t\"\007\n\005Empty2\355\001\n\005Chord\022 \n\013getNo" +
+      "deData\022\006.Empty\032\t.NodeData\022\037\n\rfindSuccess" +
+      "or\022\007.NodeId\032\005.Node\022!\n\017findPredecessor\022\007." +
+      "NodeId\032\005.Node\022&\n\024closestPrecedingNode\022\007." +
+      "NodeId\032\005.Node\022\027\n\006notify\022\005.Node\032\006.Empty\022\033" +
+      "\n\003put\022\006.Entry\032\014.PutResponse\022 \n\003get\022\013.Get" +
+      "Request\032\014.GetResponseB\034\n\030dev.serathiuk.c" +
+      "hord.grpcP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

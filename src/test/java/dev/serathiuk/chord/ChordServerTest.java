@@ -1,6 +1,5 @@
 package dev.serathiuk.chord;
 
-import dev.serathiuk.chord.grpc.Empty;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+
 
 class ChordServerTest {
 
@@ -38,321 +37,35 @@ class ChordServerTest {
                 .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
                 .build());
 
-        try(var stub = new ChordGrpcStub(LOCALHOST, port)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
+        try(var  node = new GrpcChordNode(LOCALHOST, port)) {
+            var id = Key.hash(LOCALHOST, port);
+            assertEquals(id, node.getId());
+            assertEquals(LOCALHOST, node.getHost());
+            assertEquals(port, node.getPort());
 
-            assertEquals(Key.hash(LOCALHOST, port), nodeData.getNode().getId());
-            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-            assertEquals(port, nodeData.getNode().getPort());
+            var successor = node.getSuccessor();
+            assertEquals(id, successor.getId());
+            assertEquals(LOCALHOST, successor.getHost());
+            assertEquals(port, successor.getPort());
 
-            assertEquals("", nodeData.getNodeSuccessor().getId());
-            assertEquals("", nodeData.getNodeSuccessor().getHost());
-            assertEquals(0, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals("", nodeData.getNodePredecessor().getId());
-            assertEquals("", nodeData.getNodePredecessor().getHost());
-            assertEquals(0, nodeData.getNodePredecessor().getPort());
+            var predecessor = node.getPredecessor();
+            assertEquals(id, predecessor.getId());
+            assertEquals(LOCALHOST, predecessor.getHost());
+            assertEquals(port, predecessor.getPort());
         }
     }
 
     @Test
-    public void testNetworkWithTwoNodes() throws Exception {
+    public void testNetworkWithTwoeNode() throws Exception {
         var port1 = 6661;
         var port2 = 6662;
 
         createServer(ChordServerConfigBuilder.aChordServerConfig()
-                    .withLocalHost(LOCALHOST)
-                    .withLocalPort(port1)
-                    .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
-                    .build());
-
-        createServer(ChordServerConfigBuilder.aChordServerConfig()
-                    .withLocalHost(LOCALHOST)
-                    .withLocalPort(port2)
-                    .withRemoteHost(LOCALHOST)
-                    .withRemotePort(port1)
-                    .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
-                    .build());
-
-        Thread.sleep(5000);
-
-        // Check node 2
-        try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNode().getId());
-            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-            assertEquals(port2, nodeData.getNode().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port1, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port1, nodeData.getNodePredecessor().getPort());
-        }
-
-        // Check node 1
-        try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNode().getId());
-            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-            assertEquals(port1, nodeData.getNode().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port2, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port2, nodeData.getNodePredecessor().getPort());
-        }
-    }
-
-    @Test
-    public void testNetworkWithFiveNodes() throws Exception {
-        var port3 = 6663; //6
-        var port2 = 6662; //10
-//        var port5 = 6665; //13
-        var port1 = 6661; //18
-        var port4 = 6664; //20
-
-        // Add First Server
-        step1IntegrationTest(port1);
-
-        // Add Second Server
-        step2IntegrationTest(port2, port1);
-
-        // Add Third Server
-        step3IntegrationTest(port3, port1, port2);
-
-        // Add Fourth Server
-        step4IntegrationTest(port4, port1, port2, port3);
-
-//
-//        createServer(ChordServerConfigBuilder.aChordServerConfig()
-//                .withLocalHost(LOCALHOST)
-//                .withLocalPort(port5)
-//                .withRemoteHost(LOCALHOST)
-//                .withRemotePort(port1)
-//                .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
-//                .build());
-//
-//        Thread.sleep(10000);
-//
-//        // port3 -> port2 -> port5 -> port1 -> port4 -> port3
-//
-//        // Check port 1
-//        try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
-//            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-//
-//            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNode().getId());
-//            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-//            assertEquals(port1, nodeData.getNode().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNodeSuccessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-//            assertEquals(port4, nodeData.getNodeSuccessor().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port5), nodeData.getNodePredecessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-//            assertEquals(port5, nodeData.getNodePredecessor().getPort());
-//        }
-//
-//        // Check port 2
-//        try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
-//            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-//
-//            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNode().getId());
-//            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-//            assertEquals(port2, nodeData.getNode().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port5), nodeData.getNodeSuccessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-//            assertEquals(port5, nodeData.getNodeSuccessor().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-//            assertEquals(port3, nodeData.getNodePredecessor().getPort());
-//        }
-//
-//        // Check port3
-//        try(var stub = new ChordGrpcStub(LOCALHOST, port3)) {
-//            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-//
-//            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNode().getId());
-//            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-//            assertEquals(port3, nodeData.getNode().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-//            assertEquals(port2, nodeData.getNodeSuccessor().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNodePredecessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-//            assertEquals(port4, nodeData.getNodePredecessor().getPort());
-//        }
-//
-//        // Check node 4
-//        try(var stub = new ChordGrpcStub(LOCALHOST, port4)) {
-//            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-//
-//            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNode().getId());
-//            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-//            assertEquals(port4, nodeData.getNode().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-//            assertEquals(port3, nodeData.getNodeSuccessor().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-//            assertEquals(port1, nodeData.getNodePredecessor().getPort());
-//        }
-//
-//        // Check port 5
-//        try(var stub = new ChordGrpcStub(LOCALHOST, port5)) {
-//            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-//
-//            assertEquals(Key.hash(LOCALHOST, port5), nodeData.getNode().getId());
-//            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-//            assertEquals(port5, nodeData.getNode().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-//            assertEquals(port1, nodeData.getNodeSuccessor().getPort());
-//
-//            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
-//            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-//            assertEquals(port2, nodeData.getNodePredecessor().getPort());
-//        }
-
-    }
-
-    private void step4IntegrationTest(int port4, int port1, int port2, int port3) throws Exception {
-        createServer(ChordServerConfigBuilder.aChordServerConfig()
                 .withLocalHost(LOCALHOST)
-                .withLocalPort(port4)
-                .withRemoteHost(LOCALHOST)
-                .withRemotePort(port1)
+                .withLocalPort(port1)
                 .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
                 .build());
 
-        // Check first server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port4, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port2, nodeData.getNodePredecessor().getPort());
-        }
-
-        // Check second server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port1, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port3, nodeData.getNodePredecessor().getPort());
-        }
-
-        // Check third server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port3)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port2, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port4, nodeData.getNodePredecessor().getPort());
-        }
-
-        // Check fourth server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port4)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port4), nodeData.getNode().getId());
-            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-            assertEquals(port4, nodeData.getNode().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port3, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port1, nodeData.getNodePredecessor().getPort());
-        }
-    }
-
-    private void step3IntegrationTest(int port3, int port1, int port2) throws Exception {
-        createServer(ChordServerConfigBuilder.aChordServerConfig()
-                .withLocalHost(LOCALHOST)
-                .withLocalPort(port3)
-                .withRemoteHost(LOCALHOST)
-                .withRemotePort(port1)
-                .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
-                .build());
-
-        // 3 -> 2 -> 1
-
-        // Check first server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port3, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port2, nodeData.getNodePredecessor().getPort());
-        }
-
-        // Check second server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port1, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port3, nodeData.getNodePredecessor().getPort());
-        }
-
-        // Check third server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port3)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port3), nodeData.getNode().getId());
-            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-            assertEquals(port3, nodeData.getNode().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port2, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port1, nodeData.getNodePredecessor().getPort());
-        }
-    }
-
-    private void step2IntegrationTest(int port2, int port1) throws Exception {
         createServer(ChordServerConfigBuilder.aChordServerConfig()
                 .withLocalHost(LOCALHOST)
                 .withLocalPort(port2)
@@ -361,61 +74,33 @@ class ChordServerTest {
                 .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
                 .build());
 
-        // Check first server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
+        try(var  node1 = new GrpcChordNode(LOCALHOST, port1);
+            var  node2 = new GrpcChordNode(LOCALHOST, port2)) {
 
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port2, nodeData.getNodeSuccessor().getPort());
+            var id1 = Key.hash(LOCALHOST, port1);
+            var id2 = Key.hash(LOCALHOST, port2);
 
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port2, nodeData.getNodePredecessor().getPort());
-        }
+            var node1Successor = node1.getSuccessor();
+            var node1Predecessor = node1.getPredecessor();
+            var node2Successor = node2.getSuccessor();
+            var node2Predecessor = node2.getPredecessor();
 
-        // Check second server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port2)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
+            assertEquals(id1, node1.getId());
+            assertEquals(LOCALHOST, node1.getHost());
+            assertEquals(port1, node1.getPort());
 
-            assertEquals(Key.hash(LOCALHOST, port2), nodeData.getNode().getId());
-            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-            assertEquals(port2, nodeData.getNode().getPort());
+            assertEquals(id2, node2.getId());
+            assertEquals(LOCALHOST, node1.getHost());
+            assertEquals(port2, node2.getPort());
 
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port1, nodeData.getNodeSuccessor().getPort());
+            assertEquals(node1.getId(), node2Successor.getId());
+            assertEquals(node1.getId(), node2Predecessor.getId());
 
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port1, nodeData.getNodePredecessor().getPort());
+            assertEquals(node2.getId(), node1Successor.getId());
+            assertEquals(node2.getId(), node1Predecessor.getId());
         }
     }
 
-    private void step1IntegrationTest(int port1) throws Exception {
-        createServer(ChordServerConfigBuilder.aChordServerConfig()
-                .withLocalHost(LOCALHOST)
-                .withLocalPort(port1)
-                .withNumberOfBitsKey(NUMBER_OF_BITS_KEY)
-                .build());
-
-        // Check first server
-        try(var stub = new ChordGrpcStub(LOCALHOST, port1)) {
-            var nodeData = stub.getStub().getNodeData(Empty.getDefaultInstance());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNode().getId());
-            assertEquals(LOCALHOST, nodeData.getNode().getHost());
-            assertEquals(port1, nodeData.getNode().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodeSuccessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodeSuccessor().getHost());
-            assertEquals(port1, nodeData.getNodeSuccessor().getPort());
-
-            assertEquals(Key.hash(LOCALHOST, port1), nodeData.getNodePredecessor().getId());
-            assertEquals(LOCALHOST, nodeData.getNodePredecessor().getHost());
-            assertEquals(port1, nodeData.getNodePredecessor().getPort());
-        }
-    }
 
     private void createServer(ChordServerConfig config) throws Exception {
         executor.execute(() -> {

@@ -10,48 +10,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
-    private ReentrantLock lock = new ReentrantLock();
+    private ChordServerConfig config;
     private Server server;
     private ExecutorService executorService;
-    private Node[] fingerTable;
-    private Node node;
-    private Node successor;
-    private Node predecessor;
-    private ChordServerConfig config;
-    private boolean started = false;
+
     private Map<String, String> mapInformation = new HashMap<>();
+    private LocalChordNode node;
+
+    private boolean started = false;
 
     public ChordServer(ChordServerConfig config) {
         this.config = config;
 
-        var numberOfBitsKey = config.numberOfBitsKey() > 0 ? config.numberOfBitsKey() : 120;
-        fingerTable = new Node[numberOfBitsKey];
-
-        this.node = Node.newBuilder()
-                .setId(Key.hash(config.localHost(), config.localPort()))
-                .setHost(config.localHost())
-                .setPort(config.localPort())
-                .build();
-
-        if(!StringUtils.isEmpty(config.remoteHost()) && config.remotePort() > 0) {
-            this.successor = Node.newBuilder()
-                    .setId(Key.hash(config.remoteHost(), config.remotePort()))
-                    .setHost(config.remoteHost())
-                    .setPort(config.remotePort())
-                    .build();
-
-            System.out.println("Node "+node.getId()+" | Configure successor: "+ this.successor);
-        }
-
-        System.out.println("Node "+node.getId()+" | Configure node: "+ this.node);
+        node = new LocalChordNode(config.localHost(), config.localPort());
     }
 
     @Override
@@ -82,13 +59,15 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
                     throw new RuntimeException(e);
                 }
 
-                join();
+                if(!StringUtils.isEmpty(config.remoteHost()) && config.remotePort() > 0) {
+                    node.join(new GrpcChordNode(config.remoteHost(), config.remotePort()));
+                }
 
                 while(started) {
                     try {
                         Thread.sleep(500);
-                        fixFingers();
-                        stabilize();
+                        node.fixFingers();
+                        node.stabilize();
                     } catch (InterruptedException e) {
                         System.err.println( "Node "+node.getId());
                         e.printStackTrace();
@@ -105,120 +84,24 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
     @Override
     public void findSuccessor(NodeId request, StreamObserver<Node> responseObserver) {
-        responseObserver.onNext(findSuccessor(request));
+        responseObserver.onNext(GrpcUtil.toNode(node.findSuccessor(request.getId())));
         responseObserver.onCompleted();
-    }
-
-    private Node findSuccessor(NodeId request) {
-        if(request.getId().equals(node.getId()))
-            return node;
-
-        var pred = findPredecessor(request);
-        if(pred.getId().equals(node.getId()))
-            return pred;
-
-        try(var chordStub = new ChordGrpcStub(pred)) {
-            return chordStub.getNodeData().getNodeSuccessor();
-        } catch (Exception e) {
-            System.err.println( "Node "+node.getId());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    private Node findPredecessor(NodeId request) {
-        if(successor == null || StringUtils.isEmpty(successor.getId()))
-            return node;
-
-        var n = node;
-        while (!Key.isBetween(request.getId(), node.getId(), successor.getId(), true)) {
-            n = closestPrecedingFinger(request.getId());
-        }
-        return n;
-    }
-
-    private Node closestPrecedingFinger(String id) {
-        for (var i = fingerTable.length - 1; i >= 0; i--) {
-            var n = fingerTable[i];
-            if (n == null)
-                continue;
-
-            if (Key.isBetween(n.getId(), node.getId(), id, false))
-                return n;
-        }
-
-        return node;
-    }
-
-    private void join() {
-        if(successor == null || StringUtils.isEmpty(successor.getId()) || successor.getId().equals(node.getId())) {
-            successor = null;
-            predecessor = null;
-            fingerTable[0] = null;
-            return;
-        }
-
-        try(var chordStub = new ChordGrpcStub(successor)) {
-            successor = chordStub.getStub().findSuccessor(NodeId.newBuilder()
-                    .setId(node.getId())
-                    .build());
-            predecessor = null;
-        } catch (Exception e) {
-            System.err.println( "Node "+node.getId());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        if(!successor.getId().equals(node.getId())) {
-            try(var chordStub = new ChordGrpcStub(successor)) {
-                chordStub.getStub().notify(node);
-            } catch (Exception e) {
-                System.err.println( "Node "+node.getId());
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override
     public void getNodeData(Empty request, StreamObserver<NodeData> responseObserver) {
-        responseObserver.onNext(getNodeData());
+        responseObserver.onNext(NodeData.newBuilder()
+                .setNode(GrpcUtil.toNode(node))
+                .setNodeSuccessor(GrpcUtil.toNode(node.getSuccessor()))
+                .setNodePredecessor(GrpcUtil.toNode(node.getPredecessor()))
+                .build());
+
         responseObserver.onCompleted();
     }
 
     @Override
     public void notify(Node request, StreamObserver<Empty> responseObserver) {
-        try {
-            lock.lock();
-
-            if(predecessor == null || StringUtils.isEmpty(predecessor.getId()) ||
-                    Key.isBetween(request.getId(), predecessor.getId(), node.getId(), false)) {
-                predecessor = request;
-                System.out.println("Node "+node.getId()+" | Atualizado predecessor de "+node.getId()+" para: "+predecessor);
-            }
-
-            if(successor == null || StringUtils.isEmpty(successor.getId()) ||
-                    Key.isBetween(request.getId(), node.getId(), successor.getId(), false)) {
-                successor = request;
-                System.out.println("Node "+node.getId()+" | Atualizado successor de "+node.getId()+" para: "+successor);
-            }
-
-            if(!predecessor.getId().equals(node.getId())) {
-                try(var chordStub = new ChordGrpcStub(predecessor)) {
-                    chordStub.getStub().notify(node);
-                } catch (Exception e) {
-                    System.err.println( "Node "+node.getId());
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }
-            }
-
-            responseObserver.onNext(Empty.getDefaultInstance());
-            responseObserver.onCompleted();
-        } finally {
-            lock.unlock();
-        }
+        node.notify(GrpcUtil.fromNode(request));
     }
 
     @Override
@@ -231,84 +114,11 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
         super.get(request, responseObserver);
     }
 
-    public void stabilize() {
-        try {
-            lock.lock();
-
-            if(successor == null || successor.getPort() <= 0 || successor.getId().equals(node.getId()))
-                return;
-
-            System.out.println("Node "+node.getId()+" | Stabilizing node: " + node.toString());
-            try(var chordStub = new ChordGrpcStub(successor)) {
-                var x = chordStub.getNodeData().getNodePredecessor();
-                if(x != null && Key.isBetween(x.getId(), node.getId(), successor.getId(), false)) {
-                    successor = x;
-                    fingerTable[0] = successor;
-                    System.out.println("Node "+node.getId()+" | New successor: " + successor);
-                }
-            } catch (Exception e) {
-                System.err.println( "Node "+node.getId());
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-
-            if(!successor.getId().equals(node.getId())) {
-                try(var chordStub = new ChordGrpcStub(successor)) {
-                    chordStub.getStub().notify(node);
-                } catch (Exception e) {
-                    System.err.println( "Node "+node.getId());
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public void fixFingers() {
-       try {
-           lock.lock();
-
-            var random = new Random();
-            var indice = random.nextInt(fingerTable.length);
-            var identificador = ChordUtil.calculateFTNode(node.getId(), indice+1, fingerTable.length);
-
-            System.out.println("Node "+node.getId()+" | Fixing finger: " + identificador);
-
-            fingerTable[indice] = findSuccessor(NodeId.newBuilder()
-                    .setId(identificador)
-                    .build());
-
-            if(indice == 0) {
-                successor = fingerTable[0];
-            }
-
-            System.out.println("Node "+node.getId()+" | Fixed finger: " + identificador+ " Node: "+ fingerTable[indice].getId());
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public NodeData getNodeData() {
-        var builder = NodeData.newBuilder();
-
-        if(predecessor != null)
-            builder.setNodePredecessor(predecessor);
-
-        if(successor != null)
-            builder.setNodeSuccessor(successor);
-
-        builder.setNode(node);
-
-        return builder.build();
-    }
-
-    public boolean isStarted() {
-        return started;
-    }
-
     public void shutdownNow() {
         server.shutdownNow();
+    }
+
+    public ChordNode getNode() {
+        return node;
     }
 }

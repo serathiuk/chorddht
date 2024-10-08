@@ -43,9 +43,11 @@ message Empty {
 }
 
 service Chord {
-  rpc findSuccessor(NodeId) returns (Node);
-  rpc notify(Node) returns (Empty);
   rpc getNodeData(Empty) returns (NodeData);
+  rpc findSuccessor(NodeId) returns (Node);
+  rpc findPredecessor(NodeId) returns (Node);
+  rpc closestPrecedingNode(NodeId) returns (Node);
+  rpc notify(Node) returns (Empty);
   rpc put(Entry) returns (PutResponse);
   rpc get(GetRequest) returns (GetResponse);
 }

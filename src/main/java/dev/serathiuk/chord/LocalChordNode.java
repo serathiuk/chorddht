@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class LocalChordNode implements ChordNode {
+public class LocalChordNode implements ChordNode, Joinable {
 
     private Logger logger = LoggerFactory.getLogger(LocalChordNode.class);
 
@@ -67,8 +67,7 @@ public class LocalChordNode implements ChordNode {
         return x != null ? x : this;
     }
 
-    @Override
-    public ChordNode findPredecessor(String id) {
+    private ChordNode findPredecessor(String id) {
         ChordNode n = this;
 
         if(n.getSuccessor() == null) {
