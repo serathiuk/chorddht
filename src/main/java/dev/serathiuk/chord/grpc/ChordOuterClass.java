@@ -26,11 +26,6 @@ public final class ChordOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Node_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_NodeData_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_NodeData_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Entry_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -66,20 +61,17 @@ public final class ChordOuterClass {
     java.lang.String[] descriptorData = {
       "\n\013chord.proto\"\024\n\006NodeId\022\n\n\002id\030\001 \001(\t\".\n\004N" +
       "ode\022\n\n\002id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 " +
-      "\001(\r\"]\n\010NodeData\022\023\n\004node\030\001 \001(\0132\005.Node\022\034\n\r" +
-      "nodeSuccessor\030\002 \001(\0132\005.Node\022\036\n\017nodePredec" +
-      "essor\030\003 \001(\0132\005.Node\"#\n\005Entry\022\013\n\003key\030\001 \001(\t" +
-      "\022\r\n\005value\030\002 \001(\t\"\035\n\013PutResponse\022\016\n\006nodeId" +
-      "\030\001 \001(\t\"\031\n\nGetRequest\022\013\n\003key\030\001 \001(\t\"9\n\013Get" +
-      "Response\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\022\016\n\006" +
-      "nodeId\030\003 \001(\t\"\007\n\005Empty2\355\001\n\005Chord\022 \n\013getNo" +
-      "deData\022\006.Empty\032\t.NodeData\022\037\n\rfindSuccess" +
-      "or\022\007.NodeId\032\005.Node\022!\n\017findPredecessor\022\007." +
-      "NodeId\032\005.Node\022&\n\024closestPrecedingNode\022\007." +
-      "NodeId\032\005.Node\022\027\n\006notify\022\005.Node\032\006.Empty\022\033" +
-      "\n\003put\022\006.Entry\032\014.PutResponse\022 \n\003get\022\013.Get" +
-      "Request\032\014.GetResponseB\034\n\030dev.serathiuk.c" +
-      "hord.grpcP\001b\006proto3"
+      "\001(\r\"#\n\005Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
+      "\"\035\n\013PutResponse\022\016\n\006nodeId\030\001 \001(\t\"\031\n\nGetRe" +
+      "quest\022\013\n\003key\030\001 \001(\t\"9\n\013GetResponse\022\013\n\003key" +
+      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\022\016\n\006nodeId\030\003 \001(\t\"\007\n" +
+      "\005Empty2\350\001\n\005Chord\022\037\n\016getPredecessor\022\006.Emp" +
+      "ty\032\005.Node\022\035\n\014getSuccessor\022\006.Empty\032\005.Node" +
+      "\022\037\n\rfindSuccessor\022\007.NodeId\032\005.Node\022&\n\024clo" +
+      "sestPrecedingNode\022\007.NodeId\032\005.Node\022\027\n\006not" +
+      "ify\022\005.Node\032\006.Empty\022\033\n\003put\022\006.Entry\032\014.PutR" +
+      "esponse\022 \n\003get\022\013.GetRequest\032\014.GetRespons" +
+      "eB\034\n\030dev.serathiuk.chord.grpcP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -97,38 +89,32 @@ public final class ChordOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Node_descriptor,
         new java.lang.String[] { "Id", "Host", "Port", });
-    internal_static_NodeData_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_NodeData_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_NodeData_descriptor,
-        new java.lang.String[] { "Node", "NodeSuccessor", "NodePredecessor", });
     internal_static_Entry_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_Entry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Entry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_PutResponse_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_PutResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_PutResponse_descriptor,
         new java.lang.String[] { "NodeId", });
     internal_static_GetRequest_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_GetRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetRequest_descriptor,
         new java.lang.String[] { "Key", });
     internal_static_GetResponse_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_GetResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetResponse_descriptor,
         new java.lang.String[] { "Key", "Value", "NodeId", });
     internal_static_Empty_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_Empty_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Empty_descriptor,

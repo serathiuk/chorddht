@@ -18,12 +18,13 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
     private ChordServerConfig config;
     private Server server;
-    private ExecutorService executorService;
+    private ExecutorService executorServiceFixFinger;
+    private ExecutorService executorServiceStabilize;
 
     private Map<String, String> mapInformation = new HashMap<>();
     private LocalChordNode node;
 
-    private boolean started = false;
+    private volatile boolean started = false;
 
     public ChordServer(ChordServerConfig config) {
         this.config = config;
@@ -36,8 +37,8 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
         try {
             server = Grpc.newServerBuilderForPort(node.getPort(), InsecureServerCredentials.create())
                     .addService(this)
-                    .keepAliveTime(5, TimeUnit.SECONDS)  // Tempo entre verificações de keepalive
-                    .keepAliveTimeout(10, TimeUnit.SECONDS)
+                    .keepAliveTime(60, TimeUnit.SECONDS)  // Tempo entre verificações de keepalive
+                    .keepAliveTimeout(120, TimeUnit.SECONDS)
                     .build()
                     .start();
 
@@ -51,13 +52,10 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
             started = true;
 
-            executorService = Executors.newFixedThreadPool(1);
-            executorService.execute(() -> {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            executorServiceStabilize = Executors.newFixedThreadPool(1);
+            executorServiceStabilize.execute(() -> {
+                while (!started)
+                    Thread.onSpinWait();
 
                 if(!StringUtils.isEmpty(config.remoteHost()) && config.remotePort() > 0) {
                     node.join(new GrpcChordNode(config.remoteHost(), config.remotePort()));
@@ -65,9 +63,29 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
                 while(started) {
                     try {
+                        Thread.sleep(300);
+                        node.stabilize();
+                    } catch (InterruptedException e) {
+                        System.err.println( "Node "+node.getId());
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            executorServiceFixFinger = Executors.newFixedThreadPool(1);
+            executorServiceFixFinger.execute(() -> {
+                if(!started) return;
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.err.println( "Node "+node.getId());
+                    e.printStackTrace();
+                }
+                while(started) {
+                    try {
                         Thread.sleep(500);
                         node.fixFingers();
-                        node.stabilize();
                     } catch (InterruptedException e) {
                         System.err.println( "Node "+node.getId());
                         e.printStackTrace();
@@ -89,29 +107,39 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
     }
 
     @Override
-    public void getNodeData(Empty request, StreamObserver<NodeData> responseObserver) {
-        responseObserver.onNext(NodeData.newBuilder()
-                .setNode(GrpcUtil.toNode(node))
-                .setNodeSuccessor(GrpcUtil.toNode(node.getSuccessor()))
-                .setNodePredecessor(GrpcUtil.toNode(node.getPredecessor()))
-                .build());
+    public void getPredecessor(Empty request, StreamObserver<Node> responseObserver) {
+        responseObserver.onNext(GrpcUtil.toNode(node.getPredecessor()));
+        responseObserver.onCompleted();
+    }
 
+    @Override
+    public void getSuccessor(Empty request, StreamObserver<Node> responseObserver) {
+        responseObserver.onNext(GrpcUtil.toNode(node.getSuccessor()));
         responseObserver.onCompleted();
     }
 
     @Override
     public void notify(Node request, StreamObserver<Empty> responseObserver) {
         node.notify(GrpcUtil.fromNode(request));
+
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
     }
 
     @Override
     public void put(Entry request, StreamObserver<PutResponse> responseObserver) {
         super.put(request, responseObserver);
+
+        responseObserver.onNext(PutResponse.getDefaultInstance());
+        responseObserver.onCompleted();
     }
 
     @Override
     public void get(GetRequest request, StreamObserver<GetResponse> responseObserver) {
         super.get(request, responseObserver);
+
+        responseObserver.onNext(GetResponse.getDefaultInstance());
+        responseObserver.onCompleted();
     }
 
     public void shutdownNow() {

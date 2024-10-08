@@ -16,34 +16,65 @@ public final class ChordGrpc {
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.Empty,
-      dev.serathiuk.chord.grpc.NodeData> getGetNodeDataMethod;
+      dev.serathiuk.chord.grpc.Node> getGetPredecessorMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "getNodeData",
+      fullMethodName = SERVICE_NAME + '/' + "getPredecessor",
       requestType = dev.serathiuk.chord.grpc.Empty.class,
-      responseType = dev.serathiuk.chord.grpc.NodeData.class,
+      responseType = dev.serathiuk.chord.grpc.Node.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.Empty,
-      dev.serathiuk.chord.grpc.NodeData> getGetNodeDataMethod() {
-    io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.Empty, dev.serathiuk.chord.grpc.NodeData> getGetNodeDataMethod;
-    if ((getGetNodeDataMethod = ChordGrpc.getGetNodeDataMethod) == null) {
+      dev.serathiuk.chord.grpc.Node> getGetPredecessorMethod() {
+    io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.Empty, dev.serathiuk.chord.grpc.Node> getGetPredecessorMethod;
+    if ((getGetPredecessorMethod = ChordGrpc.getGetPredecessorMethod) == null) {
       synchronized (ChordGrpc.class) {
-        if ((getGetNodeDataMethod = ChordGrpc.getGetNodeDataMethod) == null) {
-          ChordGrpc.getGetNodeDataMethod = getGetNodeDataMethod =
-              io.grpc.MethodDescriptor.<dev.serathiuk.chord.grpc.Empty, dev.serathiuk.chord.grpc.NodeData>newBuilder()
+        if ((getGetPredecessorMethod = ChordGrpc.getGetPredecessorMethod) == null) {
+          ChordGrpc.getGetPredecessorMethod = getGetPredecessorMethod =
+              io.grpc.MethodDescriptor.<dev.serathiuk.chord.grpc.Empty, dev.serathiuk.chord.grpc.Node>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
-              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "getNodeData"))
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "getPredecessor"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   dev.serathiuk.chord.grpc.Empty.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  dev.serathiuk.chord.grpc.NodeData.getDefaultInstance()))
-              .setSchemaDescriptor(new ChordMethodDescriptorSupplier("getNodeData"))
+                  dev.serathiuk.chord.grpc.Node.getDefaultInstance()))
+              .setSchemaDescriptor(new ChordMethodDescriptorSupplier("getPredecessor"))
               .build();
         }
       }
     }
-    return getGetNodeDataMethod;
+    return getGetPredecessorMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.Empty,
+      dev.serathiuk.chord.grpc.Node> getGetSuccessorMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "getSuccessor",
+      requestType = dev.serathiuk.chord.grpc.Empty.class,
+      responseType = dev.serathiuk.chord.grpc.Node.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.Empty,
+      dev.serathiuk.chord.grpc.Node> getGetSuccessorMethod() {
+    io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.Empty, dev.serathiuk.chord.grpc.Node> getGetSuccessorMethod;
+    if ((getGetSuccessorMethod = ChordGrpc.getGetSuccessorMethod) == null) {
+      synchronized (ChordGrpc.class) {
+        if ((getGetSuccessorMethod = ChordGrpc.getGetSuccessorMethod) == null) {
+          ChordGrpc.getGetSuccessorMethod = getGetSuccessorMethod =
+              io.grpc.MethodDescriptor.<dev.serathiuk.chord.grpc.Empty, dev.serathiuk.chord.grpc.Node>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "getSuccessor"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  dev.serathiuk.chord.grpc.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  dev.serathiuk.chord.grpc.Node.getDefaultInstance()))
+              .setSchemaDescriptor(new ChordMethodDescriptorSupplier("getSuccessor"))
+              .build();
+        }
+      }
+    }
+    return getGetSuccessorMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.NodeId,
@@ -75,37 +106,6 @@ public final class ChordGrpc {
       }
     }
     return getFindSuccessorMethod;
-  }
-
-  private static volatile io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.NodeId,
-      dev.serathiuk.chord.grpc.Node> getFindPredecessorMethod;
-
-  @io.grpc.stub.annotations.RpcMethod(
-      fullMethodName = SERVICE_NAME + '/' + "findPredecessor",
-      requestType = dev.serathiuk.chord.grpc.NodeId.class,
-      responseType = dev.serathiuk.chord.grpc.Node.class,
-      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.NodeId,
-      dev.serathiuk.chord.grpc.Node> getFindPredecessorMethod() {
-    io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.NodeId, dev.serathiuk.chord.grpc.Node> getFindPredecessorMethod;
-    if ((getFindPredecessorMethod = ChordGrpc.getFindPredecessorMethod) == null) {
-      synchronized (ChordGrpc.class) {
-        if ((getFindPredecessorMethod = ChordGrpc.getFindPredecessorMethod) == null) {
-          ChordGrpc.getFindPredecessorMethod = getFindPredecessorMethod =
-              io.grpc.MethodDescriptor.<dev.serathiuk.chord.grpc.NodeId, dev.serathiuk.chord.grpc.Node>newBuilder()
-              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
-              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "findPredecessor"))
-              .setSampledToLocalTracing(true)
-              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  dev.serathiuk.chord.grpc.NodeId.getDefaultInstance()))
-              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  dev.serathiuk.chord.grpc.Node.getDefaultInstance()))
-              .setSchemaDescriptor(new ChordMethodDescriptorSupplier("findPredecessor"))
-              .build();
-        }
-      }
-    }
-    return getFindPredecessorMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<dev.serathiuk.chord.grpc.NodeId,
@@ -282,9 +282,16 @@ public final class ChordGrpc {
 
     /**
      */
-    default void getNodeData(dev.serathiuk.chord.grpc.Empty request,
-        io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.NodeData> responseObserver) {
-      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetNodeDataMethod(), responseObserver);
+    default void getPredecessor(dev.serathiuk.chord.grpc.Empty request,
+        io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetPredecessorMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void getSuccessor(dev.serathiuk.chord.grpc.Empty request,
+        io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetSuccessorMethod(), responseObserver);
     }
 
     /**
@@ -292,13 +299,6 @@ public final class ChordGrpc {
     default void findSuccessor(dev.serathiuk.chord.grpc.NodeId request,
         io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getFindSuccessorMethod(), responseObserver);
-    }
-
-    /**
-     */
-    default void findPredecessor(dev.serathiuk.chord.grpc.NodeId request,
-        io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node> responseObserver) {
-      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getFindPredecessorMethod(), responseObserver);
     }
 
     /**
@@ -359,10 +359,18 @@ public final class ChordGrpc {
 
     /**
      */
-    public void getNodeData(dev.serathiuk.chord.grpc.Empty request,
-        io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.NodeData> responseObserver) {
+    public void getPredecessor(dev.serathiuk.chord.grpc.Empty request,
+        io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
-          getChannel().newCall(getGetNodeDataMethod(), getCallOptions()), request, responseObserver);
+          getChannel().newCall(getGetPredecessorMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void getSuccessor(dev.serathiuk.chord.grpc.Empty request,
+        io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getGetSuccessorMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -371,14 +379,6 @@ public final class ChordGrpc {
         io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getFindSuccessorMethod(), getCallOptions()), request, responseObserver);
-    }
-
-    /**
-     */
-    public void findPredecessor(dev.serathiuk.chord.grpc.NodeId request,
-        io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node> responseObserver) {
-      io.grpc.stub.ClientCalls.asyncUnaryCall(
-          getChannel().newCall(getFindPredecessorMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -432,9 +432,16 @@ public final class ChordGrpc {
 
     /**
      */
-    public dev.serathiuk.chord.grpc.NodeData getNodeData(dev.serathiuk.chord.grpc.Empty request) {
+    public dev.serathiuk.chord.grpc.Node getPredecessor(dev.serathiuk.chord.grpc.Empty request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
-          getChannel(), getGetNodeDataMethod(), getCallOptions(), request);
+          getChannel(), getGetPredecessorMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public dev.serathiuk.chord.grpc.Node getSuccessor(dev.serathiuk.chord.grpc.Empty request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getGetSuccessorMethod(), getCallOptions(), request);
     }
 
     /**
@@ -442,13 +449,6 @@ public final class ChordGrpc {
     public dev.serathiuk.chord.grpc.Node findSuccessor(dev.serathiuk.chord.grpc.NodeId request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getFindSuccessorMethod(), getCallOptions(), request);
-    }
-
-    /**
-     */
-    public dev.serathiuk.chord.grpc.Node findPredecessor(dev.serathiuk.chord.grpc.NodeId request) {
-      return io.grpc.stub.ClientCalls.blockingUnaryCall(
-          getChannel(), getFindPredecessorMethod(), getCallOptions(), request);
     }
 
     /**
@@ -498,10 +498,18 @@ public final class ChordGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<dev.serathiuk.chord.grpc.NodeData> getNodeData(
+    public com.google.common.util.concurrent.ListenableFuture<dev.serathiuk.chord.grpc.Node> getPredecessor(
         dev.serathiuk.chord.grpc.Empty request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
-          getChannel().newCall(getGetNodeDataMethod(), getCallOptions()), request);
+          getChannel().newCall(getGetPredecessorMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<dev.serathiuk.chord.grpc.Node> getSuccessor(
+        dev.serathiuk.chord.grpc.Empty request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getGetSuccessorMethod(), getCallOptions()), request);
     }
 
     /**
@@ -510,14 +518,6 @@ public final class ChordGrpc {
         dev.serathiuk.chord.grpc.NodeId request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getFindSuccessorMethod(), getCallOptions()), request);
-    }
-
-    /**
-     */
-    public com.google.common.util.concurrent.ListenableFuture<dev.serathiuk.chord.grpc.Node> findPredecessor(
-        dev.serathiuk.chord.grpc.NodeId request) {
-      return io.grpc.stub.ClientCalls.futureUnaryCall(
-          getChannel().newCall(getFindPredecessorMethod(), getCallOptions()), request);
     }
 
     /**
@@ -553,9 +553,9 @@ public final class ChordGrpc {
     }
   }
 
-  private static final int METHODID_GET_NODE_DATA = 0;
-  private static final int METHODID_FIND_SUCCESSOR = 1;
-  private static final int METHODID_FIND_PREDECESSOR = 2;
+  private static final int METHODID_GET_PREDECESSOR = 0;
+  private static final int METHODID_GET_SUCCESSOR = 1;
+  private static final int METHODID_FIND_SUCCESSOR = 2;
   private static final int METHODID_CLOSEST_PRECEDING_NODE = 3;
   private static final int METHODID_NOTIFY = 4;
   private static final int METHODID_PUT = 5;
@@ -578,16 +578,16 @@ public final class ChordGrpc {
     @java.lang.SuppressWarnings("unchecked")
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
-        case METHODID_GET_NODE_DATA:
-          serviceImpl.getNodeData((dev.serathiuk.chord.grpc.Empty) request,
-              (io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.NodeData>) responseObserver);
+        case METHODID_GET_PREDECESSOR:
+          serviceImpl.getPredecessor((dev.serathiuk.chord.grpc.Empty) request,
+              (io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node>) responseObserver);
+          break;
+        case METHODID_GET_SUCCESSOR:
+          serviceImpl.getSuccessor((dev.serathiuk.chord.grpc.Empty) request,
+              (io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node>) responseObserver);
           break;
         case METHODID_FIND_SUCCESSOR:
           serviceImpl.findSuccessor((dev.serathiuk.chord.grpc.NodeId) request,
-              (io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node>) responseObserver);
-          break;
-        case METHODID_FIND_PREDECESSOR:
-          serviceImpl.findPredecessor((dev.serathiuk.chord.grpc.NodeId) request,
               (io.grpc.stub.StreamObserver<dev.serathiuk.chord.grpc.Node>) responseObserver);
           break;
         case METHODID_CLOSEST_PRECEDING_NODE:
@@ -625,12 +625,19 @@ public final class ChordGrpc {
   public static final io.grpc.ServerServiceDefinition bindService(AsyncService service) {
     return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
         .addMethod(
-          getGetNodeDataMethod(),
+          getGetPredecessorMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
               dev.serathiuk.chord.grpc.Empty,
-              dev.serathiuk.chord.grpc.NodeData>(
-                service, METHODID_GET_NODE_DATA)))
+              dev.serathiuk.chord.grpc.Node>(
+                service, METHODID_GET_PREDECESSOR)))
+        .addMethod(
+          getGetSuccessorMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              dev.serathiuk.chord.grpc.Empty,
+              dev.serathiuk.chord.grpc.Node>(
+                service, METHODID_GET_SUCCESSOR)))
         .addMethod(
           getFindSuccessorMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
@@ -638,13 +645,6 @@ public final class ChordGrpc {
               dev.serathiuk.chord.grpc.NodeId,
               dev.serathiuk.chord.grpc.Node>(
                 service, METHODID_FIND_SUCCESSOR)))
-        .addMethod(
-          getFindPredecessorMethod(),
-          io.grpc.stub.ServerCalls.asyncUnaryCall(
-            new MethodHandlers<
-              dev.serathiuk.chord.grpc.NodeId,
-              dev.serathiuk.chord.grpc.Node>(
-                service, METHODID_FIND_PREDECESSOR)))
         .addMethod(
           getClosestPrecedingNodeMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
@@ -721,9 +721,9 @@ public final class ChordGrpc {
         if (result == null) {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new ChordFileDescriptorSupplier())
-              .addMethod(getGetNodeDataMethod())
+              .addMethod(getGetPredecessorMethod())
+              .addMethod(getGetSuccessorMethod())
               .addMethod(getFindSuccessorMethod())
-              .addMethod(getFindPredecessorMethod())
               .addMethod(getClosestPrecedingNodeMethod())
               .addMethod(getNotifyMethod())
               .addMethod(getPutMethod())

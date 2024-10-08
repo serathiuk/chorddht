@@ -90,7 +90,13 @@ public class LocalChordNode implements ChordNode, Joinable {
 
     @Override
     public ChordNode closestPrecedingNode(String id) {
-        return fingerTable.closestPrecedingNode(id);
+        try {
+            lock.lock();
+            return fingerTable.closestPrecedingNode(id);
+        } finally {
+            lock.unlock();
+        }
+
     }
 
     @Override
