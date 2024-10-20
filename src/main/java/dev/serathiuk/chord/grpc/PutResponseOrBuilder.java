@@ -9,14 +9,44 @@ public interface PutResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string nodeId = 1;</code>
+   * <code>string key = 1;</code>
+   * @return The key.
+   */
+  java.lang.String getKey();
+  /**
+   * <code>string key = 1;</code>
+   * @return The bytes for key.
+   */
+  com.google.protobuf.ByteString
+      getKeyBytes();
+
+  /**
+   * <code>string value = 2;</code>
+   * @return The value.
+   */
+  java.lang.String getValue();
+  /**
+   * <code>string value = 2;</code>
+   * @return The bytes for value.
+   */
+  com.google.protobuf.ByteString
+      getValueBytes();
+
+  /**
+   * <code>string nodeId = 3;</code>
    * @return The nodeId.
    */
   java.lang.String getNodeId();
   /**
-   * <code>string nodeId = 1;</code>
+   * <code>string nodeId = 3;</code>
    * @return The bytes for nodeId.
    */
   com.google.protobuf.ByteString
       getNodeIdBytes();
+
+  /**
+   * <code>bool putInNextNode = 4;</code>
+   * @return The putInNextNode.
+   */
+  boolean getPutInNextNode();
 }

@@ -24,7 +24,7 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
     private Map<String, String> mapInformation = new HashMap<>();
     private LocalChordNode node;
 
-    private volatile boolean started = false;
+    private boolean started = false;
 
     public ChordServer(ChordServerConfig config) {
         this.config = config;
@@ -128,17 +128,13 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
     @Override
     public void put(Entry request, StreamObserver<PutResponse> responseObserver) {
-        super.put(request, responseObserver);
-
-        responseObserver.onNext(PutResponse.getDefaultInstance());
+        responseObserver.onNext(node.put(request.getKey(), request.getValue()));
         responseObserver.onCompleted();
     }
 
     @Override
     public void get(GetRequest request, StreamObserver<GetResponse> responseObserver) {
-        super.get(request, responseObserver);
-
-        responseObserver.onNext(GetResponse.getDefaultInstance());
+        responseObserver.onNext(node.get(request.getKey()));
         responseObserver.onCompleted();
     }
 

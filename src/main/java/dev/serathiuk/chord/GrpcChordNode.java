@@ -1,8 +1,6 @@
 package dev.serathiuk.chord;
 
-import dev.serathiuk.chord.grpc.ChordGrpc;
-import dev.serathiuk.chord.grpc.Empty;
-import dev.serathiuk.chord.grpc.NodeId;
+import dev.serathiuk.chord.grpc.*;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
@@ -13,10 +11,10 @@ import java.util.concurrent.TimeUnit;
 
 public class GrpcChordNode implements ChordNode, Closeable {
 
-    private String id;
-    private String host;
-    private int port;
-    private ManagedChannel channel;
+    private final String id;
+    private final String host;
+    private final int port;
+    private final ManagedChannel channel;
 
     public GrpcChordNode(String host, int port) {
         this.host = host;
@@ -68,6 +66,21 @@ public class GrpcChordNode implements ChordNode, Closeable {
     @Override
     public ChordNode closestPrecedingNode(String id) {
         return GrpcUtil.fromNode(createStub().closestPrecedingNode(NodeId.newBuilder().setId(id).build()));
+    }
+
+    @Override
+    public PutResponse put(String key, String value) {
+        return createStub().put(Entry.newBuilder()
+                .setKey(key)
+                .setValue(value)
+                .build());
+    }
+
+    @Override
+    public GetResponse get(String key) {
+        return createStub().get(GetRequest.newBuilder()
+                .setKey(key)
+                .build());
     }
 
     @Override

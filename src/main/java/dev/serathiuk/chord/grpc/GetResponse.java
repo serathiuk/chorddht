@@ -159,6 +159,17 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int GETINNEXTNODE_FIELD_NUMBER = 4;
+  private boolean getInNextNode_ = false;
+  /**
+   * <code>bool getInNextNode = 4;</code>
+   * @return The getInNextNode.
+   */
+  @java.lang.Override
+  public boolean getGetInNextNode() {
+    return getInNextNode_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -182,6 +193,9 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(nodeId_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 3, nodeId_);
     }
+    if (getInNextNode_ != false) {
+      output.writeBool(4, getInNextNode_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -199,6 +213,10 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(nodeId_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, nodeId_);
+    }
+    if (getInNextNode_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(4, getInNextNode_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -221,6 +239,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getValue())) return false;
     if (!getNodeId()
         .equals(other.getNodeId())) return false;
+    if (getGetInNextNode()
+        != other.getGetInNextNode()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -238,6 +258,9 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getValue().hashCode();
     hash = (37 * hash) + NODEID_FIELD_NUMBER;
     hash = (53 * hash) + getNodeId().hashCode();
+    hash = (37 * hash) + GETINNEXTNODE_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getGetInNextNode());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -372,6 +395,7 @@ private static final long serialVersionUID = 0L;
       key_ = "";
       value_ = "";
       nodeId_ = "";
+      getInNextNode_ = false;
       return this;
     }
 
@@ -413,6 +437,9 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
         result.nodeId_ = nodeId_;
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.getInNextNode_ = getInNextNode_;
       }
     }
 
@@ -475,6 +502,9 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000004;
         onChanged();
       }
+      if (other.getGetInNextNode() != false) {
+        setGetInNextNode(other.getGetInNextNode());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -516,6 +546,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000004;
               break;
             } // case 26
+            case 32: {
+              getInNextNode_ = input.readBool();
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 32
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -745,6 +780,38 @@ private static final long serialVersionUID = 0L;
       checkByteStringIsUtf8(value);
       nodeId_ = value;
       bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+
+    private boolean getInNextNode_ ;
+    /**
+     * <code>bool getInNextNode = 4;</code>
+     * @return The getInNextNode.
+     */
+    @java.lang.Override
+    public boolean getGetInNextNode() {
+      return getInNextNode_;
+    }
+    /**
+     * <code>bool getInNextNode = 4;</code>
+     * @param value The getInNextNode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setGetInNextNode(boolean value) {
+
+      getInNextNode_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool getInNextNode = 4;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearGetInNextNode() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      getInNextNode_ = false;
       onChanged();
       return this;
     }

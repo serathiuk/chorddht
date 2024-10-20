@@ -62,16 +62,18 @@ public final class ChordOuterClass {
       "\n\013chord.proto\"\024\n\006NodeId\022\n\n\002id\030\001 \001(\t\".\n\004N" +
       "ode\022\n\n\002id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 " +
       "\001(\r\"#\n\005Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
-      "\"\035\n\013PutResponse\022\016\n\006nodeId\030\001 \001(\t\"\031\n\nGetRe" +
-      "quest\022\013\n\003key\030\001 \001(\t\"9\n\013GetResponse\022\013\n\003key" +
-      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\022\016\n\006nodeId\030\003 \001(\t\"\007\n" +
-      "\005Empty2\350\001\n\005Chord\022\037\n\016getPredecessor\022\006.Emp" +
-      "ty\032\005.Node\022\035\n\014getSuccessor\022\006.Empty\032\005.Node" +
-      "\022\037\n\rfindSuccessor\022\007.NodeId\032\005.Node\022&\n\024clo" +
-      "sestPrecedingNode\022\007.NodeId\032\005.Node\022\027\n\006not" +
-      "ify\022\005.Node\032\006.Empty\022\033\n\003put\022\006.Entry\032\014.PutR" +
-      "esponse\022 \n\003get\022\013.GetRequest\032\014.GetRespons" +
-      "eB\034\n\030dev.serathiuk.chord.grpcP\001b\006proto3"
+      "\"P\n\013PutResponse\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 " +
+      "\001(\t\022\016\n\006nodeId\030\003 \001(\t\022\025\n\rputInNextNode\030\004 \001" +
+      "(\010\"\031\n\nGetRequest\022\013\n\003key\030\001 \001(\t\"P\n\013GetResp" +
+      "onse\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\022\016\n\006node" +
+      "Id\030\003 \001(\t\022\025\n\rgetInNextNode\030\004 \001(\010\"\007\n\005Empty" +
+      "2\350\001\n\005Chord\022\037\n\016getPredecessor\022\006.Empty\032\005.N" +
+      "ode\022\035\n\014getSuccessor\022\006.Empty\032\005.Node\022\037\n\rfi" +
+      "ndSuccessor\022\007.NodeId\032\005.Node\022&\n\024closestPr" +
+      "ecedingNode\022\007.NodeId\032\005.Node\022\027\n\006notify\022\005." +
+      "Node\032\006.Empty\022\033\n\003put\022\006.Entry\032\014.PutRespons" +
+      "e\022 \n\003get\022\013.GetRequest\032\014.GetResponseB\034\n\030d" +
+      "ev.serathiuk.chord.grpcP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -100,7 +102,7 @@ public final class ChordOuterClass {
     internal_static_PutResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_PutResponse_descriptor,
-        new java.lang.String[] { "NodeId", });
+        new java.lang.String[] { "Key", "Value", "NodeId", "PutInNextNode", });
     internal_static_GetRequest_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_GetRequest_fieldAccessorTable = new
@@ -112,7 +114,7 @@ public final class ChordOuterClass {
     internal_static_GetResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetResponse_descriptor,
-        new java.lang.String[] { "Key", "Value", "NodeId", });
+        new java.lang.String[] { "Key", "Value", "NodeId", "GetInNextNode", });
     internal_static_Empty_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_Empty_fieldAccessorTable = new

@@ -1,22 +1,29 @@
 package dev.serathiuk.chord;
 
+import dev.serathiuk.chord.grpc.GetResponse;
+import dev.serathiuk.chord.grpc.PutResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LocalChordNode implements ChordNode, Joinable {
 
-    private Logger logger = LoggerFactory.getLogger(LocalChordNode.class);
+    private final Logger logger = LoggerFactory.getLogger(LocalChordNode.class);
 
-    private String id;
-    private String host;
-    private int port;
+    private final String id;
+    private final String host;
+    private final int port;
     private ChordNode successor;
     private ChordNode predecessor;
-    private FingerTable fingerTable;
-    private Lock lock = new ReentrantLock();
+    private final FingerTable fingerTable;
+    private final Lock lock = new ReentrantLock();
+    private final Map<String, String> mapNodeData = Collections.synchronizedMap(new HashMap<>());
+
 
     public LocalChordNode(String host, int port) {
         this.id = Key.hash(host, port);
@@ -140,6 +147,46 @@ public class LocalChordNode implements ChordNode, Joinable {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public PutResponse put(String key, String value) {
+        var hash = Key.hash(key);
+        logger.info("Node {} put key: {} hash: {}", id, key, hash);
+        if(Key.isBetween(hash, id, successor.getId(), false)) {
+            logger.info("Puting the value in Node {} put key: {} value: {}", id, key, value);
+            mapNodeData.put(key, value);
+            return PutResponse.newBuilder()
+                    .setNodeId(id)
+                    .setKey(key)
+                    .setValue(value)
+                    .build();
+        }
+
+        return getNextNode(hash).put(key, value);
+    }
+
+    @Override
+    public GetResponse get(String key) {
+        var hash = Key.hash(key);
+        if(Key.isBetween(hash, id, successor.getId(), true)) {
+            var node =  mapNodeData.get(key);
+            return GetResponse.newBuilder()
+                    .setValue(node)
+                    .setNodeId(id)
+                    .setKey(key)
+                    .build();
+        }
+
+        return getNextNode(hash).get(key);
+    }
+
+    private ChordNode getNextNode(String hash) {
+        ChordNode node = this;
+        if(!Key.isBetween(hash, node.getId(), node.getSuccessor().getId(), false)) {
+            node = node.findSuccessor(hash);
+        }
+        return node.getPredecessor();
     }
 
     public void stabilize() {

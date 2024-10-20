@@ -1,5 +1,8 @@
 package dev.serathiuk.chord;
 
+import dev.serathiuk.chord.grpc.GetResponse;
+import dev.serathiuk.chord.grpc.PutResponse;
+
 import java.math.BigInteger;
 
 public interface ChordNode {
@@ -15,4 +18,6 @@ public interface ChordNode {
     public void notify(ChordNode node);
     public ChordNode findSuccessor(String id);
     public ChordNode closestPrecedingNode(String id);
+    public PutResponse put(String key, String value);
+    public GetResponse get(String key);
 }

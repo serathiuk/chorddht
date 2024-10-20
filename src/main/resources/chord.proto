@@ -19,7 +19,10 @@ message Entry {
 }
 
 message PutResponse {
-  string nodeId = 1;
+  string key = 1;
+  string value = 2;
+  string nodeId = 3;
+  bool putInNextNode = 4;
 }
 
 message GetRequest {
@@ -30,6 +33,7 @@ message GetResponse {
   string key = 1;
   string value = 2;
   string nodeId = 3;
+  bool getInNextNode = 4;
 }
 
 message Empty {

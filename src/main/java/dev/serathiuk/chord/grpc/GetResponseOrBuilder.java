@@ -43,4 +43,10 @@ public interface GetResponseOrBuilder extends
    */
   com.google.protobuf.ByteString
       getNodeIdBytes();
+
+  /**
+   * <code>bool getInNextNode = 4;</code>
+   * @return The getInNextNode.
+   */
+  boolean getGetInNextNode();
 }
