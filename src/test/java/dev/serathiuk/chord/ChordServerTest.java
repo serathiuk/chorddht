@@ -386,7 +386,7 @@ class ChordServerTest {
             chordServers.add(chordServer);
             chordServer.run();
         });
-        Thread.sleep(10000);
+        Thread.sleep(3000);
     }
 
     @AfterEach

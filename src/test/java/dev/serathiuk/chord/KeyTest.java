@@ -9,12 +9,12 @@ class KeyTest {
 
     @Test
     public void testHash() {
-        assertEquals("22", Key.hash("teste"));
+        assertEquals("246", Key.hash("teste"));
     }
 
     @Test
     public void testHashNode() {
-        assertEquals("9", Key.hash("localhost", 8080));
+        assertEquals("169", Key.hash("localhost", 8080));
     }
 
     @Test

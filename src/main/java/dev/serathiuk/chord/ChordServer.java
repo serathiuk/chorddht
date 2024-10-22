@@ -119,6 +119,12 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
     }
 
     @Override
+    public void closestPrecedingNode(NodeId request, StreamObserver<Node> responseObserver) {
+        responseObserver.onNext(GrpcUtil.toNode(node.closestPrecedingNode(request.getId())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void notify(Node request, StreamObserver<Empty> responseObserver) {
         node.notify(GrpcUtil.fromNode(request));
 
