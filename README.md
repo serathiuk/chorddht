@@ -1,5 +1,5 @@
 # Serathiuk's Chord DHT
-A simple Java Chord DHT Implementation.
+A simple Java Chord DHT Implementation, based in the paper ["Chord: A Scalable Peer-to-peer Lookup Service for Internet Applications"](chord.pdf) of Ion Stoica, Robert Morris, David Karger, M. Frans Kaashoek, Hari Balakrishnan. 
 
 ## Usage
 
