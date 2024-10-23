@@ -81,12 +81,6 @@
         </dependency>
 
         <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli</artifactId>
-            <version>4.7.6</version>
-        </dependency>
-
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>1.5.6</version>
@@ -187,6 +181,22 @@
             </plugin>
 
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>dev.serathiuk.chord.Main</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <executions>
@@ -201,7 +211,7 @@
                             </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>dev.serathiuk.chord.Main</mainClass>
+                                    <mainClass>dev.serathiuk.chord.server.ServerMain</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
