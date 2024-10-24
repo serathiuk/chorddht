@@ -232,6 +232,37 @@ public final class ChordGrpc {
     return getGetMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<dev.serathiuk.chord.server.grpc.Empty,
+      dev.serathiuk.chord.server.grpc.Empty> getPingMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "ping",
+      requestType = dev.serathiuk.chord.server.grpc.Empty.class,
+      responseType = dev.serathiuk.chord.server.grpc.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<dev.serathiuk.chord.server.grpc.Empty,
+      dev.serathiuk.chord.server.grpc.Empty> getPingMethod() {
+    io.grpc.MethodDescriptor<dev.serathiuk.chord.server.grpc.Empty, dev.serathiuk.chord.server.grpc.Empty> getPingMethod;
+    if ((getPingMethod = ChordGrpc.getPingMethod) == null) {
+      synchronized (ChordGrpc.class) {
+        if ((getPingMethod = ChordGrpc.getPingMethod) == null) {
+          ChordGrpc.getPingMethod = getPingMethod =
+              io.grpc.MethodDescriptor.<dev.serathiuk.chord.server.grpc.Empty, dev.serathiuk.chord.server.grpc.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "ping"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  dev.serathiuk.chord.server.grpc.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  dev.serathiuk.chord.server.grpc.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new ChordMethodDescriptorSupplier("ping"))
+              .build();
+        }
+      }
+    }
+    return getPingMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -328,6 +359,13 @@ public final class ChordGrpc {
         io.grpc.stub.StreamObserver<dev.serathiuk.chord.server.grpc.GetResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetMethod(), responseObserver);
     }
+
+    /**
+     */
+    default void ping(dev.serathiuk.chord.server.grpc.Empty request,
+        io.grpc.stub.StreamObserver<dev.serathiuk.chord.server.grpc.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getPingMethod(), responseObserver);
+    }
   }
 
   /**
@@ -412,6 +450,14 @@ public final class ChordGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getGetMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void ping(dev.serathiuk.chord.server.grpc.Empty request,
+        io.grpc.stub.StreamObserver<dev.serathiuk.chord.server.grpc.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getPingMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -477,6 +523,13 @@ public final class ChordGrpc {
     public dev.serathiuk.chord.server.grpc.GetResponse get(dev.serathiuk.chord.server.grpc.GetRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getGetMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public dev.serathiuk.chord.server.grpc.Empty ping(dev.serathiuk.chord.server.grpc.Empty request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getPingMethod(), getCallOptions(), request);
     }
   }
 
@@ -551,6 +604,14 @@ public final class ChordGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getGetMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<dev.serathiuk.chord.server.grpc.Empty> ping(
+        dev.serathiuk.chord.server.grpc.Empty request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getPingMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_GET_PREDECESSOR = 0;
@@ -560,6 +621,7 @@ public final class ChordGrpc {
   private static final int METHODID_NOTIFY = 4;
   private static final int METHODID_PUT = 5;
   private static final int METHODID_GET = 6;
+  private static final int METHODID_PING = 7;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -605,6 +667,10 @@ public final class ChordGrpc {
         case METHODID_GET:
           serviceImpl.get((dev.serathiuk.chord.server.grpc.GetRequest) request,
               (io.grpc.stub.StreamObserver<dev.serathiuk.chord.server.grpc.GetResponse>) responseObserver);
+          break;
+        case METHODID_PING:
+          serviceImpl.ping((dev.serathiuk.chord.server.grpc.Empty) request,
+              (io.grpc.stub.StreamObserver<dev.serathiuk.chord.server.grpc.Empty>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -673,6 +739,13 @@ public final class ChordGrpc {
               dev.serathiuk.chord.server.grpc.GetRequest,
               dev.serathiuk.chord.server.grpc.GetResponse>(
                 service, METHODID_GET)))
+        .addMethod(
+          getPingMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              dev.serathiuk.chord.server.grpc.Empty,
+              dev.serathiuk.chord.server.grpc.Empty>(
+                service, METHODID_PING)))
         .build();
   }
 
@@ -728,6 +801,7 @@ public final class ChordGrpc {
               .addMethod(getNotifyMethod())
               .addMethod(getPutMethod())
               .addMethod(getGetMethod())
+              .addMethod(getPingMethod())
               .build();
         }
       }

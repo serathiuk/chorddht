@@ -48,4 +48,5 @@ service Chord {
   rpc notify(Node) returns (Empty);
   rpc put(Entry) returns (PutResponse);
   rpc get(GetRequest) returns (GetResponse);
+  rpc ping(Empty) returns (Empty);
 }

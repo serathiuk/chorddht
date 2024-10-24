@@ -8,21 +8,17 @@ import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
-    private ChordServerConfig config;
+    private final ChordServerConfig config;
     private Server server;
     private ExecutorService executorServiceFixFinger;
     private ExecutorService executorServiceStabilize;
-
-    private Map<String, String> mapInformation = new HashMap<>();
-    private LocalChordNode node;
+    private final LocalChordNode node;
 
     private boolean started = false;
 
@@ -47,7 +43,7 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
             // Shutdown hook para fechar o servidor corretamente
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 System.err.println("** Servidor encerrado via shutdown hook **");
-                server.shutdownNow();
+                shutdownNow();
             }));
 
             started = true;
@@ -66,8 +62,8 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
                         Thread.sleep(300);
                         node.stabilize();
                     } catch (InterruptedException e) {
-                        System.err.println( "Node "+node.getId());
-                        e.printStackTrace();
+                        shutdownNow();
+                        break;
                     }
                 }
             });
@@ -80,15 +76,15 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     System.err.println( "Node "+node.getId());
-                    e.printStackTrace();
                 }
+
                 while(started) {
                     try {
                         Thread.sleep(500);
                         node.fixFingers();
                     } catch (InterruptedException e) {
-                        System.err.println( "Node "+node.getId());
-                        e.printStackTrace();
+                        shutdownNow();
+                        break;
                     }
                 }
             });
@@ -144,8 +140,19 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void ping(Empty request, StreamObserver<Empty> responseObserver) {
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
     public void shutdownNow() {
+        started = false;
+        executorServiceStabilize.shutdownNow();
+        executorServiceFixFinger.shutdownNow();
         server.shutdownNow();
+        node.shutdownNow();
+
     }
 
     public ChordNode getNode() {

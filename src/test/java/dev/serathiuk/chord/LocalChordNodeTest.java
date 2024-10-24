@@ -151,6 +151,64 @@ class LocalChordNodeTest {
         assertEquals("teste10", teste10.getKey());
         assertEquals("valor10", teste10.getValue());
         assertEquals(node4.getId(), teste10.getNodeId());
+
+        node3.setOnline(false);
+        node3.shutdownNow();
+
+        for(var i = 0; i < 10; i++) {
+            node1.fixFingers();
+            node1.stabilize();
+            node2.fixFingers();
+            node2.stabilize();
+            node4.fixFingers();
+            node4.stabilize();
+            node5.fixFingers();
+            node5.stabilize();
+        }
+
+        assertEquals(node5.getId(), node1.getSuccessor().getId());
+        assertEquals(node4.getId(), node2.getSuccessor().getId());
+        assertEquals(node1.getId(), node4.getSuccessor().getId());
+        assertEquals(node2.getId(), node5.getSuccessor().getId());
+
+        node4.setOnline(false);
+        node4.shutdownNow();
+
+        for(var i = 0; i < 10; i++) {
+            node1.fixFingers();
+            node1.stabilize();
+            node2.fixFingers();
+            node2.stabilize();
+            node5.fixFingers();
+            node5.stabilize();
+        }
+
+        assertEquals(node5.getId(), node1.getSuccessor().getId());
+        assertEquals(node1.getId(), node2.getSuccessor().getId());
+        assertEquals(node2.getId(), node5.getSuccessor().getId());
+
+        node2.setOnline(false);
+        node2.shutdownNow();
+
+        for(var i = 0; i < 10; i++) {
+            node1.fixFingers();
+            node1.stabilize();
+            node5.fixFingers();
+            node5.stabilize();
+        }
+
+        assertEquals(node5.getId(), node1.getSuccessor().getId());
+        assertEquals(node1.getId(), node5.getSuccessor().getId());
+
+        node1.setOnline(false);
+        node1.shutdownNow();
+
+        for(var i = 0; i < 10; i++) {
+            node5.fixFingers();
+            node5.stabilize();
+        }
+
+        assertEquals(node5.getId(), node5.getSuccessor().getId());
     }
 
     public static void main(String[] args) {

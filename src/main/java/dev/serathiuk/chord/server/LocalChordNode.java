@@ -23,6 +23,7 @@ public class LocalChordNode implements ChordNode, Joinable {
     private final FingerTable fingerTable;
     private final Lock lock = new ReentrantLock();
     private final Map<String, String> mapNodeData = Collections.synchronizedMap(new HashMap<>());
+    private boolean online = true;
 
 
     public LocalChordNode(String host, int port) {
@@ -128,22 +129,24 @@ public class LocalChordNode implements ChordNode, Joinable {
     }
 
     @Override
-    public void notify(ChordNode node) {
+    public boolean notify(ChordNode node) {
         try {
             lock.lock();
 
             logger.info("Node {} notified by node: {}", id, node.getId());
 
-            if (predecessor == null || Key.isBetween(node.getId(), predecessor.getId(), id, false)) {
+            if (predecessor == null || !predecessor.isOnline() || Key.isBetween(node.getId(), predecessor.getId(), id, false)) {
                 logger.info("Node {} new predecessor: {}", id, node.getId());
                 predecessor = node;
             }
 
-            if (successor == null || Key.isBetween(node.getId(), id, successor.getId(), false)) {
+            if (successor == null || !successor.isOnline() || Key.isBetween(node.getId(), id, successor.getId(), false)) {
                 logger.info("Node {} new successor: {}", id, node.getId());
                 successor = node;
                 fingerTable.setSuccessor(successor);
             }
+
+            return true;
         } finally {
             lock.unlock();
         }
@@ -181,6 +184,15 @@ public class LocalChordNode implements ChordNode, Joinable {
         return getNextNode(hash).get(key);
     }
 
+    @Override
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
     private ChordNode getNextNode(String hash) {
         ChordNode node = this;
         if(!Key.isBetween(hash, node.getId(), node.getSuccessor().getId(), false)) {
@@ -197,6 +209,13 @@ public class LocalChordNode implements ChordNode, Joinable {
 
             if(successor == null)
                 return;
+
+            if(!successor.isOnline()) {
+                logger.info("Node {} stabilization successor is offline.", id);
+                fingerTable.setSuccessor(null);
+                successor = fingerTable.findSuccessor()
+                        .orElse(this);
+            }
 
             var x = successor.getPredecessor();
 
@@ -227,6 +246,16 @@ public class LocalChordNode implements ChordNode, Joinable {
             fingerTable.fixFingers();
         } finally {
             lock.unlock();
+        }
+    }
+
+    public void shutdownNow() {
+        if(!successor.getId().equals(id) && successor.isOnline()) {
+            successor.notify(predecessor);
+        }
+
+        if(!predecessor.getId().equals(id) && predecessor.isOnline()) {
+            predecessor.notify(successor);
         }
     }
 

@@ -67,13 +67,14 @@ public final class ChordOuterClass {
       "(\010\"\031\n\nGetRequest\022\013\n\003key\030\001 \001(\t\"P\n\013GetResp" +
       "onse\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\022\016\n\006node" +
       "Id\030\003 \001(\t\022\025\n\rgetInNextNode\030\004 \001(\010\"\007\n\005Empty" +
-      "2\350\001\n\005Chord\022\037\n\016getPredecessor\022\006.Empty\032\005.N" +
+      "2\200\002\n\005Chord\022\037\n\016getPredecessor\022\006.Empty\032\005.N" +
       "ode\022\035\n\014getSuccessor\022\006.Empty\032\005.Node\022\037\n\rfi" +
       "ndSuccessor\022\007.NodeId\032\005.Node\022&\n\024closestPr" +
       "ecedingNode\022\007.NodeId\032\005.Node\022\027\n\006notify\022\005." +
       "Node\032\006.Empty\022\033\n\003put\022\006.Entry\032\014.PutRespons" +
-      "e\022 \n\003get\022\013.GetRequest\032\014.GetResponseB#\n\037d" +
-      "ev.serathiuk.chord.server.grpcP\001b\006proto3"
+      "e\022 \n\003get\022\013.GetRequest\032\014.GetResponse\022\026\n\004p" +
+      "ing\022\006.Empty\032\006.EmptyB#\n\037dev.serathiuk.cho" +
+      "rd.server.grpcP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

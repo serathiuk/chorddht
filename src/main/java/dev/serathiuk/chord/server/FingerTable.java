@@ -3,7 +3,10 @@ package dev.serathiuk.chord.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public class FingerTable {
 
@@ -30,6 +33,16 @@ public class FingerTable {
         return node;
     }
 
+    public Optional<ChordNode> findSuccessor() {
+        var optSucessor = Stream.of(fingerTableArr)
+                .filter(Objects::nonNull)
+                .findFirst();
+
+        optSucessor.ifPresent(chordNode -> fingerTableArr[0] = chordNode);
+
+        return optSucessor;
+    }
+
     public ChordNode getSuccessor() {
         return fingerTableArr[0];
     }
@@ -48,6 +61,9 @@ public class FingerTable {
             }
 
             var successor = node.findSuccessor(identificador);
-            fingerTableArr[indice] = successor;
+            if(successor.isOnline())
+                fingerTableArr[indice] = successor;
+            else
+                fingerTableArr[indice] = null;
     }
 }

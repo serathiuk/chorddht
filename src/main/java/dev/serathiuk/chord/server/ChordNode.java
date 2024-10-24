@@ -15,9 +15,10 @@ public interface ChordNode {
     public int getPort();
     public ChordNode getSuccessor();
     public ChordNode getPredecessor();
-    public void notify(ChordNode node);
+    public boolean notify(ChordNode node);
     public ChordNode findSuccessor(String id);
     public ChordNode closestPrecedingNode(String id);
     public PutResponse put(String key, String value);
     public GetResponse get(String key);
+    public boolean isOnline();
 }

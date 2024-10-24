@@ -6,7 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,12 +21,12 @@ class ChordServerTest {
     private static final int NUMBER_OF_BITS_KEY = 5;
 
     private ExecutorService executor;
-    private List<ChordServer> chordServers;
+    private Map<Integer, ChordServer> chordServers;
 
     @BeforeEach
     public void setUp() {
         executor = Executors.newFixedThreadPool(10);
-        chordServers = new ArrayList<>();
+        chordServers = new HashMap<>();
     }
 
 
@@ -385,15 +387,16 @@ class ChordServerTest {
     private void createServer(ChordServerConfig config) throws Exception {
         executor.execute(() -> {
             var chordServer = new ChordServer(config);
-            chordServers.add(chordServer);
+            chordServers.put(config.localPort(), chordServer);
             chordServer.run();
+            chordServer.shutdownNow();
         });
         Thread.sleep(3000);
     }
 
     @AfterEach
     public void tearDown() {
-        chordServers.forEach(ChordServer::shutdownNow);
+        chordServers.values().forEach(ChordServer::shutdownNow);
         executor.shutdownNow();
         chordServers.clear();
     }
