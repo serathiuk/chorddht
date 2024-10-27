@@ -147,6 +147,8 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
     }
 
     public void shutdownNow() {
+        if(!started) return;
+
         started = false;
         executorServiceStabilize.shutdownNow();
         executorServiceFixFinger.shutdownNow();

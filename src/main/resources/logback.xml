@@ -9,5 +9,5 @@
         <appender-ref ref="STDOUT" />
     </root>
 
-    <logger name="dev.serathiuk.chord" level="WARN" />
+    <logger name="dev.serathiuk.chord" level="INFO" />
 </configuration>

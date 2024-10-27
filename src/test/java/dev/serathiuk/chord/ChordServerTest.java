@@ -5,9 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -157,6 +155,56 @@ class ChordServerTest {
             assertEquals("teste3", teste3.getKey());
             assertEquals("valor3", teste3.getValue());
             assertEquals(node1.getId(), teste3.getNodeId());
+
+            assertEquals("teste4", teste4.getKey());
+            assertEquals("valor4", teste4.getValue());
+            assertEquals(node2.getId(), teste4.getNodeId());
+
+            assertEquals("teste5", teste5.getKey());
+            assertEquals("valor5", teste5.getValue());
+            assertEquals(node2.getId(), teste5.getNodeId());
+
+            assertEquals("teste6", teste6.getKey());
+            assertEquals("valor6", teste6.getValue());
+            assertEquals(node2.getId(), teste6.getNodeId());
+        }
+
+        var node1Shutdown = chordServers.get(port1);
+        node1Shutdown.shutdownNow();
+
+        try(var  node2 = new GrpcChordNode(LOCALHOST, port2)) {
+
+            var id1 = Key.hash(LOCALHOST, port1);
+            var id2 = Key.hash(LOCALHOST, port2);
+
+            var node2Successor = node2.getSuccessor();
+            var node2Predecessor = node2.getPredecessor();
+
+            assertEquals(id2, node2.getId());
+            assertEquals(LOCALHOST, node2.getHost());
+            assertEquals(port2, node2.getPort());
+
+            assertEquals(node2.getId(), node2Successor.getId());
+            assertEquals(node2.getId(), node2Predecessor.getId());
+
+            var teste1 = node2.get("teste1");
+            var teste2 = node2.get("teste2");
+            var teste3 = node2.get("teste3");
+            var teste4 = node2.get("teste4");
+            var teste5 = node2.get("teste5");
+            var teste6 = node2.get("teste6");
+
+            assertEquals("teste1", teste1.getKey());
+            assertEquals("valor1", teste1.getValue());
+            assertEquals(node2.getId(), teste1.getNodeId());
+
+            assertEquals("teste2", teste2.getKey());
+            assertEquals("valor2", teste2.getValue());
+            assertEquals(node2.getId(), teste2.getNodeId());
+
+            assertEquals("teste3", teste3.getKey());
+            assertEquals("valor3", teste3.getValue());
+            assertEquals(node2.getId(), teste3.getNodeId());
 
             assertEquals("teste4", teste4.getKey());
             assertEquals("valor4", teste4.getValue());
@@ -380,6 +428,270 @@ class ChordServerTest {
             assertEquals("valor10", teste10.getValue());
             assertEquals(node4.getId(), teste10.getNodeId());
 
+        }
+
+        var node3Shutdown = chordServers.get(port3);
+        node3Shutdown.shutdownNow();
+
+        try(var node1 = new GrpcChordNode(LOCALHOST, port1);
+            var node2 = new GrpcChordNode(LOCALHOST, port2);
+            var node4 = new GrpcChordNode(LOCALHOST, port4);
+            var node5 = new GrpcChordNode(LOCALHOST, port5)) {
+
+            assertEquals(node5.getId(), node1.getSuccessor().getId());
+            assertEquals(node4.getId(), node1.getPredecessor().getId());
+
+            assertEquals(node4.getId(), node2.getSuccessor().getId());
+            assertEquals(node5.getId(), node2.getPredecessor().getId());
+
+            assertEquals(node1.getId(), node4.getSuccessor().getId());
+            assertEquals(node2.getId(), node4.getPredecessor().getId());
+
+            assertEquals(node2.getId(), node5.getSuccessor().getId());
+            assertEquals(node1.getId(), node5.getPredecessor().getId());
+
+            var teste1 = node5.get("teste1");
+            var teste2 = node4.get("teste2");
+            var teste3 = node2.get("teste3");
+            var teste4 = node1.get("teste4");
+            var teste5 = node5.get("teste5");
+            var teste6 = node4.get("teste6");
+            var teste7 = node2.get("teste7");
+            var teste8 = node1.get("teste8");
+            var teste9 = node5.get("teste9");
+            var teste10 = node4.get("teste10");
+
+            assertEquals("teste1", teste1.getKey());
+            assertEquals("valor1", teste1.getValue());
+            assertEquals(node1.getId(), teste1.getNodeId());
+
+            assertEquals("teste2", teste2.getKey());
+            assertEquals("valor2", teste2.getValue());
+            assertEquals(node1.getId(), teste2.getNodeId());
+
+            assertEquals("teste3", teste3.getKey());
+            assertEquals("valor3", teste3.getValue());
+            assertEquals(node1.getId(), teste3.getNodeId());
+
+            assertEquals("teste4", teste4.getKey());
+            assertEquals("valor4", teste4.getValue());
+            assertEquals(node4.getId(), teste4.getNodeId());
+
+            assertEquals("teste5", teste5.getKey());
+            assertEquals("valor5", teste5.getValue());
+            assertEquals(node2.getId(), teste5.getNodeId());
+
+            assertEquals("teste6", teste6.getKey());
+            assertEquals("valor6", teste6.getValue());
+            assertEquals(node2.getId(), teste6.getNodeId());
+
+            assertEquals("teste7", teste7.getKey());
+            assertEquals("valor7", teste7.getValue());
+            assertEquals(node4.getId(), teste7.getNodeId());
+
+            assertEquals("teste8", teste8.getKey());
+            assertEquals("valor8", teste8.getValue());
+            assertEquals(node1.getId(), teste8.getNodeId());
+
+            assertEquals("teste9", teste9.getKey());
+            assertEquals("valor9", teste9.getValue());
+            assertEquals(node2.getId(), teste9.getNodeId());
+
+            assertEquals("teste10", teste10.getKey());
+            assertEquals("valor10", teste10.getValue());
+            assertEquals(node4.getId(), teste10.getNodeId());
+        }
+
+        var node4Shutdown = chordServers.get(port4);
+        node4Shutdown.shutdownNow();
+
+        try(var node1 = new GrpcChordNode(LOCALHOST, port1);
+            var node2 = new GrpcChordNode(LOCALHOST, port2);
+            var node5 = new GrpcChordNode(LOCALHOST, port5)) {
+
+            assertEquals(node5.getId(), node1.getSuccessor().getId());
+            assertEquals(node2.getId(), node1.getPredecessor().getId());
+
+            assertEquals(node1.getId(), node2.getSuccessor().getId());
+            assertEquals(node5.getId(), node2.getPredecessor().getId());
+
+            assertEquals(node2.getId(), node5.getSuccessor().getId());
+            assertEquals(node1.getId(), node5.getPredecessor().getId());
+
+            var teste1 = node1.get("teste1");
+            var teste2 = node2.get("teste2");
+            var teste3 = node5.get("teste3");
+            var teste4 = node1.get("teste4");
+            var teste5 = node2.get("teste5");
+            var teste6 = node5.get("teste6");
+            var teste7 = node1.get("teste7");
+            var teste8 = node2.get("teste8");
+            var teste9 = node5.get("teste9");
+            var teste10 = node1.get("teste10");
+
+            assertEquals("teste1", teste1.getKey());
+            assertEquals("valor1", teste1.getValue());
+            assertEquals(node1.getId(), teste1.getNodeId());
+
+            assertEquals("teste2", teste2.getKey());
+            assertEquals("valor2", teste2.getValue());
+            assertEquals(node1.getId(), teste2.getNodeId());
+
+            assertEquals("teste3", teste3.getKey());
+            assertEquals("valor3", teste3.getValue());
+            assertEquals(node1.getId(), teste3.getNodeId());
+
+            assertEquals("teste4", teste4.getKey());
+            assertEquals("valor4", teste4.getValue());
+            assertEquals(node2.getId(), teste4.getNodeId());
+
+            assertEquals("teste5", teste5.getKey());
+            assertEquals("valor5", teste5.getValue());
+            assertEquals(node2.getId(), teste5.getNodeId());
+
+            assertEquals("teste6", teste6.getKey());
+            assertEquals("valor6", teste6.getValue());
+            assertEquals(node2.getId(), teste6.getNodeId());
+
+            assertEquals("teste7", teste7.getKey());
+            assertEquals("valor7", teste7.getValue());
+            assertEquals(node2.getId(), teste7.getNodeId());
+
+            assertEquals("teste8", teste8.getKey());
+            assertEquals("valor8", teste8.getValue());
+            assertEquals(node1.getId(), teste8.getNodeId());
+
+            assertEquals("teste9", teste9.getKey());
+            assertEquals("valor9", teste9.getValue());
+            assertEquals(node2.getId(), teste9.getNodeId());
+
+            assertEquals("teste10", teste10.getKey());
+            assertEquals("valor10", teste10.getValue());
+            assertEquals(node2.getId(), teste10.getNodeId());
+        }
+
+        var node5Shutdown = chordServers.get(port5);
+        node5Shutdown.shutdownNow();
+
+        try(var node1 = new GrpcChordNode(LOCALHOST, port1);
+            var node2 = new GrpcChordNode(LOCALHOST, port2)) {
+
+            assertEquals(node2.getId(), node1.getSuccessor().getId());
+            assertEquals(node2.getId(), node1.getPredecessor().getId());
+
+            assertEquals(node1.getId(), node2.getSuccessor().getId());
+            assertEquals(node1.getId(), node2.getPredecessor().getId());
+
+            var teste1 = node1.get("teste1");
+            var teste2 = node2.get("teste2");
+            var teste3 = node1.get("teste3");
+            var teste4 = node2.get("teste4");
+            var teste5 = node1.get("teste5");
+            var teste6 = node2.get("teste6");
+            var teste7 = node1.get("teste7");
+            var teste8 = node2.get("teste8");
+            var teste9 = node1.get("teste9");
+            var teste10 = node2.get("teste10");
+
+            assertEquals("teste1", teste1.getKey());
+            assertEquals("valor1", teste1.getValue());
+            assertEquals(node1.getId(), teste1.getNodeId());
+
+            assertEquals("teste2", teste2.getKey());
+            assertEquals("valor2", teste2.getValue());
+            assertEquals(node1.getId(), teste2.getNodeId());
+
+            assertEquals("teste3", teste3.getKey());
+            assertEquals("valor3", teste3.getValue());
+            assertEquals(node1.getId(), teste3.getNodeId());
+
+            assertEquals("teste4", teste4.getKey());
+            assertEquals("valor4", teste4.getValue());
+            assertEquals(node2.getId(), teste4.getNodeId());
+
+            assertEquals("teste5", teste5.getKey());
+            assertEquals("valor5", teste5.getValue());
+            assertEquals(node2.getId(), teste5.getNodeId());
+
+            assertEquals("teste6", teste6.getKey());
+            assertEquals("valor6", teste6.getValue());
+            assertEquals(node2.getId(), teste6.getNodeId());
+
+            assertEquals("teste7", teste7.getKey());
+            assertEquals("valor7", teste7.getValue());
+            assertEquals(node2.getId(), teste7.getNodeId());
+
+            assertEquals("teste8", teste8.getKey());
+            assertEquals("valor8", teste8.getValue());
+            assertEquals(node1.getId(), teste8.getNodeId());
+
+            assertEquals("teste9", teste9.getKey());
+            assertEquals("valor9", teste9.getValue());
+            assertEquals(node2.getId(), teste9.getNodeId());
+
+            assertEquals("teste10", teste10.getKey());
+            assertEquals("valor10", teste10.getValue());
+            assertEquals(node2.getId(), teste10.getNodeId());
+        }
+
+        var node1Shutdown = chordServers.get(port1);
+        node1Shutdown.shutdownNow();
+
+        try(var node2 = new GrpcChordNode(LOCALHOST, port2)) {
+
+            assertEquals(node2.getId(), node2.getSuccessor().getId());
+            assertEquals(node2.getId(), node2.getPredecessor().getId());
+
+            var teste1 = node2.get("teste1");
+            var teste2 = node2.get("teste2");
+            var teste3 = node2.get("teste3");
+            var teste4 = node2.get("teste4");
+            var teste5 = node2.get("teste5");
+            var teste6 = node2.get("teste6");
+            var teste7 = node2.get("teste7");
+            var teste8 = node2.get("teste8");
+            var teste9 = node2.get("teste9");
+            var teste10 = node2.get("teste10");
+
+            assertEquals("teste1", teste1.getKey());
+            assertEquals("valor1", teste1.getValue());
+            assertEquals(node2.getId(), teste1.getNodeId());
+
+            assertEquals("teste2", teste2.getKey());
+            assertEquals("valor2", teste2.getValue());
+            assertEquals(node2.getId(), teste2.getNodeId());
+
+            assertEquals("teste3", teste3.getKey());
+            assertEquals("valor3", teste3.getValue());
+            assertEquals(node2.getId(), teste3.getNodeId());
+
+            assertEquals("teste4", teste4.getKey());
+            assertEquals("valor4", teste4.getValue());
+            assertEquals(node2.getId(), teste4.getNodeId());
+
+            assertEquals("teste5", teste5.getKey());
+            assertEquals("valor5", teste5.getValue());
+            assertEquals(node2.getId(), teste5.getNodeId());
+
+            assertEquals("teste6", teste6.getKey());
+            assertEquals("valor6", teste6.getValue());
+            assertEquals(node2.getId(), teste6.getNodeId());
+
+            assertEquals("teste7", teste7.getKey());
+            assertEquals("valor7", teste7.getValue());
+            assertEquals(node2.getId(), teste7.getNodeId());
+
+            assertEquals("teste8", teste8.getKey());
+            assertEquals("valor8", teste8.getValue());
+            assertEquals(node2.getId(), teste8.getNodeId());
+
+            assertEquals("teste9", teste9.getKey());
+            assertEquals("valor9", teste9.getValue());
+            assertEquals(node2.getId(), teste9.getNodeId());
+
+            assertEquals("teste10", teste10.getKey());
+            assertEquals("valor10", teste10.getValue());
+            assertEquals(node2.getId(), teste10.getNodeId());
         }
     }
 

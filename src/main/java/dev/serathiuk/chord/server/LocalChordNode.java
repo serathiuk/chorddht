@@ -173,9 +173,10 @@ public class LocalChordNode implements ChordNode, Joinable {
     public GetResponse get(String key) {
         var hash = Key.hash(key);
         if(Key.isBetween(hash, id, successor.getId(), true)) {
-            var node =  mapNodeData.get(key);
+            var value =  mapNodeData.get(key);
+
             return GetResponse.newBuilder()
-                    .setValue(node)
+                    .setValue(value != null ? value : "")
                     .setNodeId(id)
                     .setKey(key)
                     .build();
@@ -250,12 +251,19 @@ public class LocalChordNode implements ChordNode, Joinable {
     }
 
     public void shutdownNow() {
+        this.online = false;
+
         if(!successor.getId().equals(id) && successor.isOnline()) {
             successor.notify(predecessor);
         }
 
         if(!predecessor.getId().equals(id) && predecessor.isOnline()) {
             predecessor.notify(successor);
+
+            for(var entry : mapNodeData.entrySet()) {
+                logger.info("Node {} shutdown key: {} value: {}", predecessor.getId(), entry.getKey(), entry.getValue());
+                predecessor.put(entry.getKey(), entry.getValue());
+            }
         }
     }
 

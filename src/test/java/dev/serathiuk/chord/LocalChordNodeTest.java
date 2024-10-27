@@ -171,6 +171,22 @@ class LocalChordNodeTest {
         assertEquals(node1.getId(), node4.getSuccessor().getId());
         assertEquals(node2.getId(), node5.getSuccessor().getId());
 
+        teste1 = node1.get("teste1");
+        teste2 = node2.get("teste2");
+        teste8 = node5.get("teste8");
+
+        assertEquals("teste1", teste1.getKey());
+        assertEquals("valor1", teste1.getValue());
+        assertEquals(node1.getId(), teste1.getNodeId());
+
+        assertEquals("teste2", teste2.getKey());
+        assertEquals("valor2", teste2.getValue());
+        assertEquals(node1.getId(), teste2.getNodeId());
+
+        assertEquals("teste8", teste8.getKey());
+        assertEquals("valor8", teste8.getValue());
+        assertEquals(node1.getId(), teste8.getNodeId());
+
         node4.setOnline(false);
         node4.shutdownNow();
 
@@ -187,6 +203,22 @@ class LocalChordNodeTest {
         assertEquals(node1.getId(), node2.getSuccessor().getId());
         assertEquals(node2.getId(), node5.getSuccessor().getId());
 
+        teste4 = node1.get("teste4");
+        teste7 = node2.get("teste7");
+        teste10 = node5.get("teste10");
+
+        assertEquals("teste4", teste4.getKey());
+        assertEquals("valor4", teste4.getValue());
+        assertEquals(node2.getId(), teste4.getNodeId());
+
+        assertEquals("teste7", teste7.getKey());
+        assertEquals("valor7", teste7.getValue());
+        assertEquals(node2.getId(), teste7.getNodeId());
+
+        assertEquals("teste10", teste10.getKey());
+        assertEquals("valor10", teste10.getValue());
+        assertEquals(node2.getId(), teste10.getNodeId());
+
         node2.setOnline(false);
         node2.shutdownNow();
 
@@ -200,6 +232,37 @@ class LocalChordNodeTest {
         assertEquals(node5.getId(), node1.getSuccessor().getId());
         assertEquals(node1.getId(), node5.getSuccessor().getId());
 
+        teste4 = node1.get("teste4");
+        teste5 = node5.get("teste5");
+        teste6 = node1.get("teste6");
+        teste7 = node5.get("teste7");
+        teste9 = node1.get("teste9");
+        teste10 = node5.get("teste10");
+
+        assertEquals("teste4", teste4.getKey());
+        assertEquals("valor4", teste4.getValue());
+        assertEquals(node5.getId(), teste4.getNodeId());
+
+        assertEquals("teste5", teste5.getKey());
+        assertEquals("valor5", teste5.getValue());
+        assertEquals(node5.getId(), teste5.getNodeId());
+
+        assertEquals("teste6", teste6.getKey());
+        assertEquals("valor6", teste6.getValue());
+        assertEquals(node5.getId(), teste6.getNodeId());
+
+        assertEquals("teste7", teste7.getKey());
+        assertEquals("valor7", teste7.getValue());
+        assertEquals(node5.getId(), teste7.getNodeId());
+
+        assertEquals("teste9", teste9.getKey());
+        assertEquals("valor9", teste9.getValue());
+        assertEquals(node5.getId(), teste9.getNodeId());
+
+        assertEquals("teste10", teste10.getKey());
+        assertEquals("valor10", teste10.getValue());
+        assertEquals(node5.getId(), teste10.getNodeId());
+
         node1.setOnline(false);
         node1.shutdownNow();
 
@@ -207,6 +270,57 @@ class LocalChordNodeTest {
             node5.fixFingers();
             node5.stabilize();
         }
+
+        teste1 = node5.get("teste1");
+        teste2 = node5.get("teste2");
+        teste3 = node5.get("teste3");
+        teste4 = node5.get("teste4");
+        teste5 = node5.get("teste5");
+        teste6 = node5.get("teste6");
+        teste7 = node5.get("teste7");
+        teste8 = node5.get("teste8");
+        teste9 = node5.get("teste9");
+        teste10 = node5.get("teste10");
+
+        assertEquals("teste1", teste1.getKey());
+        assertEquals("valor1", teste1.getValue());
+        assertEquals(node5.getId(), teste1.getNodeId());
+
+        assertEquals("teste2", teste2.getKey());
+        assertEquals("valor2", teste2.getValue());
+        assertEquals(node5.getId(), teste2.getNodeId());
+
+        assertEquals("teste3", teste3.getKey());
+        assertEquals("valor3", teste3.getValue());
+        assertEquals(node5.getId(), teste3.getNodeId());
+
+        assertEquals("teste4", teste4.getKey());
+        assertEquals("valor4", teste4.getValue());
+        assertEquals(node5.getId(), teste4.getNodeId());
+
+        assertEquals("teste5", teste5.getKey());
+        assertEquals("valor5", teste5.getValue());
+        assertEquals(node5.getId(), teste5.getNodeId());
+
+        assertEquals("teste6", teste6.getKey());
+        assertEquals("valor6", teste6.getValue());
+        assertEquals(node5.getId(), teste6.getNodeId());
+
+        assertEquals("teste7", teste7.getKey());
+        assertEquals("valor7", teste7.getValue());
+        assertEquals(node5.getId(), teste7.getNodeId());
+
+        assertEquals("teste8", teste8.getKey());
+        assertEquals("valor8", teste8.getValue());
+        assertEquals(node5.getId(), teste8.getNodeId());
+
+        assertEquals("teste9", teste9.getKey());
+        assertEquals("valor9", teste9.getValue());
+        assertEquals(node5.getId(), teste9.getNodeId());
+
+        assertEquals("teste10", teste10.getKey());
+        assertEquals("valor10", teste10.getValue());
+        assertEquals(node5.getId(), teste10.getNodeId());
 
         assertEquals(node5.getId(), node5.getSuccessor().getId());
     }
