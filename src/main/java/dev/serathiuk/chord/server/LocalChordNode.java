@@ -21,7 +21,8 @@ public class LocalChordNode implements ChordNode, Joinable {
     private ChordNode successor;
     private ChordNode predecessor;
     private final FingerTable fingerTable;
-    private final Lock lock = new ReentrantLock();
+    private final Lock locationLock = new ReentrantLock();
+    private final Lock valueLock = new ReentrantLock();
     private final Map<String, String> mapNodeData = Collections.synchronizedMap(new HashMap<>());
     private boolean online = true;
 
@@ -99,10 +100,10 @@ public class LocalChordNode implements ChordNode, Joinable {
     @Override
     public ChordNode closestPrecedingNode(String id) {
         try {
-            lock.lock();
+            locationLock.lock();
             return fingerTable.closestPrecedingNode(id);
         } finally {
-            lock.unlock();
+            locationLock.unlock();
         }
 
     }
@@ -110,7 +111,7 @@ public class LocalChordNode implements ChordNode, Joinable {
     @Override
     public void join(ChordNode node) {
         try {
-            lock.lock();
+            locationLock.lock();
 
             logger.info("Node {} joining node: {}", id, node.getId());
 
@@ -124,14 +125,14 @@ public class LocalChordNode implements ChordNode, Joinable {
             successor.notify(this);
             predecessor.notify(this);
         } finally {
-            lock.unlock();
+            locationLock.unlock();
         }
     }
 
     @Override
     public boolean notify(ChordNode node) {
         try {
-            lock.lock();
+            locationLock.lock();
 
             logger.info("Node {} notified by node: {}", id, node.getId());
 
@@ -148,41 +149,50 @@ public class LocalChordNode implements ChordNode, Joinable {
 
             return true;
         } finally {
-            lock.unlock();
+            locationLock.unlock();
         }
     }
 
     @Override
     public PutResponse put(String key, String value) {
-        var hash = Key.hash(key);
-        logger.info("Node {} put key: {} hash: {}", id, key, hash);
-        if(Key.isBetween(hash, id, successor.getId(), false)) {
-            logger.info("Puting the value in Node {} put key: {} value: {}", id, key, value);
-            mapNodeData.put(key, value);
-            return PutResponse.newBuilder()
-                    .setNodeId(id)
-                    .setKey(key)
-                    .setValue(value)
-                    .build();
-        }
+        valueLock.lock();
+        try {
+            var hash = Key.hash(key);
+            logger.info("Node {} put key: {} hash: {}", id, key, hash);
+            if(Key.isBetween(hash, id, successor.getId(), false)) {
+                logger.info("Puting the value in Node {} put key: {} value: {}", id, key, value);
+                mapNodeData.put(key, value);
+                return PutResponse.newBuilder()
+                        .setNodeId(id)
+                        .setKey(key)
+                        .setValue(value)
+                        .build();
+            }
 
-        return getNextNode(hash).put(key, value);
+            return getNextNode(hash).put(key, value);
+        } finally {
+            valueLock.unlock();
+        }
     }
 
     @Override
     public GetResponse get(String key) {
-        var hash = Key.hash(key);
-        if(Key.isBetween(hash, id, successor.getId(), true)) {
-            var value =  mapNodeData.get(key);
+        valueLock.lock();
+        try {
+            var hash = Key.hash(key);
+            if(Key.isBetween(hash, id, successor.getId(), true)) {
+                var value =  mapNodeData.get(key);
 
-            return GetResponse.newBuilder()
-                    .setValue(value != null ? value : "")
-                    .setNodeId(id)
-                    .setKey(key)
-                    .build();
+                return GetResponse.newBuilder()
+                        .setValue(value != null ? value : "")
+                        .setNodeId(id)
+                        .setKey(key)
+                        .build();
+            }
+            return getNextNode(hash).get(key);
+        } finally {
+            valueLock.unlock();
         }
-
-        return getNextNode(hash).get(key);
     }
 
     @Override
@@ -204,7 +214,7 @@ public class LocalChordNode implements ChordNode, Joinable {
 
     public void stabilize() {
         try {
-            lock.lock();
+            locationLock.lock();
 
             logger.info("Node {} start stabilization.", id);
 
@@ -233,20 +243,20 @@ public class LocalChordNode implements ChordNode, Joinable {
                 successor.notify(this);
             }
         } finally {
-            lock.unlock();
+            locationLock.unlock();
         }
     }
 
     public void fixFingers() {
         try {
-            lock.lock();
+            locationLock.lock();
 
             logger.info("Node {} fix fingers.", id);
 
             fingerTable.setSuccessor(successor);
             fingerTable.fixFingers();
         } finally {
-            lock.unlock();
+            locationLock.unlock();
         }
     }
 
@@ -259,11 +269,12 @@ public class LocalChordNode implements ChordNode, Joinable {
 
         if(!predecessor.getId().equals(id) && predecessor.isOnline()) {
             predecessor.notify(successor);
+        }
 
-            for(var entry : mapNodeData.entrySet()) {
-                logger.info("Node {} shutdown key: {} value: {}", predecessor.getId(), entry.getKey(), entry.getValue());
-                predecessor.put(entry.getKey(), entry.getValue());
-            }
+        var node = findSuccessor(id).getPredecessor();
+        for(var entry : mapNodeData.entrySet()) {
+            logger.info("Node {} shutdown key: {} value: {}", node.getId(), entry.getKey(), entry.getValue());
+            node.put(entry.getKey(), entry.getValue());
         }
     }
 

@@ -4,6 +4,7 @@ import dev.serathiuk.chord.server.grpc.*;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.StringUtils;
 
@@ -142,7 +143,12 @@ public class ChordServer  extends ChordGrpc.ChordImplBase implements Runnable {
 
     @Override
     public void ping(Empty request, StreamObserver<Empty> responseObserver) {
-        responseObserver.onNext(Empty.getDefaultInstance());
+        if(started) {
+            responseObserver.onNext(Empty.getDefaultInstance());
+        } else {
+            responseObserver.onError(new StatusRuntimeException(io.grpc.Status.UNAVAILABLE));
+        }
+
         responseObserver.onCompleted();
     }
 

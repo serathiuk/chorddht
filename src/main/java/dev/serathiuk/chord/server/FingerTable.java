@@ -24,7 +24,13 @@ public class FingerTable {
         logger.info("Busca closestPrecedingNode para id {}: {}", node.getId(), id);
         for (int i = ChordNode.NUMBER_OF_BITS_KEY - 1; i > 0; i--) {
             var fingerNode = fingerTableArr[i];
-            if(fingerNode == null) continue;
+            if(fingerNode == null)
+                continue;
+
+            if(!fingerNode.isOnline()) {
+                fingerTableArr[i] = null;
+                continue;
+            }
 
             if (Key.isBetween(fingerNode.getId(), node.getId(), id, false)) {
                 return fingerNode;

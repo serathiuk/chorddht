@@ -432,6 +432,8 @@ class ChordServerTest {
 
         var node3Shutdown = chordServers.get(port3);
         node3Shutdown.shutdownNow();
+        chordServers.remove(port3);
+        Thread.sleep(2000);
 
         try(var node1 = new GrpcChordNode(LOCALHOST, port1);
             var node2 = new GrpcChordNode(LOCALHOST, port2);
@@ -504,6 +506,9 @@ class ChordServerTest {
 
         var node4Shutdown = chordServers.get(port4);
         node4Shutdown.shutdownNow();
+        chordServers.remove(port4);
+        Thread.sleep(2000);
+
 
         try(var node1 = new GrpcChordNode(LOCALHOST, port1);
             var node2 = new GrpcChordNode(LOCALHOST, port2);
@@ -572,6 +577,8 @@ class ChordServerTest {
 
         var node5Shutdown = chordServers.get(port5);
         node5Shutdown.shutdownNow();
+        chordServers.remove(port5);
+        Thread.sleep(2000);
 
         try(var node1 = new GrpcChordNode(LOCALHOST, port1);
             var node2 = new GrpcChordNode(LOCALHOST, port2)) {
@@ -636,6 +643,8 @@ class ChordServerTest {
 
         var node1Shutdown = chordServers.get(port1);
         node1Shutdown.shutdownNow();
+        chordServers.remove(port1);
+        Thread.sleep(2000);
 
         try(var node2 = new GrpcChordNode(LOCALHOST, port2)) {
 
